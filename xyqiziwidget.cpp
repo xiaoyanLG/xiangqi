@@ -297,6 +297,7 @@ void XYQiziWidget::mousePressEvent(QMouseEvent *event)
         mbLeftMousePressed = true;
         moLastPos = event->globalPos();
     }
+    XYQipanWidget::getInstance()->raiseTempQizi();
     raise();
 }
 

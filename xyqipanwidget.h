@@ -16,6 +16,7 @@ public:
     void moveToNearestPos(XYQiziWidget *qizi);
     XYQiziWidget *getPositionQizi(int row, int column);
     void setTempQizi(XYQiziWidget *qizi);
+    void raiseTempQizi();
     void showTempQizi(XYQiziWidget *qizi);
 
 signals:

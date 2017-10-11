@@ -18,7 +18,7 @@ XYQipanWidget *XYQipanWidget::getInstance()
 }
 
 XYQipanWidget::XYQipanWidget(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent), tempQizi(NULL)
 {
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
     qipanPixmap.load(":/xiangqi/qipan.png");
@@ -64,7 +64,10 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
     QPoint nearestPos = getQiziCurNearestPos(qizi);
     int row = nearestPos.x();
     int column = nearestPos.y();
-    tempQizi->setVisible(false);
+    if (tempQizi != NULL)
+    {
+        tempQizi->setVisible(false);
+    }
     if (qizi->isMovable(row, column))
     {
         putQizi(qizi, row, column);
@@ -85,22 +88,33 @@ void XYQipanWidget::setTempQizi(XYQiziWidget *qizi)
     tempQizi = qizi;
 }
 
+void XYQipanWidget::raiseTempQizi()
+{
+    if (tempQizi != NULL)
+    {
+        tempQizi->raise();
+    }
+}
+
 void XYQipanWidget::showTempQizi(XYQiziWidget *qizi)
 {
     QPoint nearestPos = getQiziCurNearestPos(qizi);
     int row = nearestPos.x();
     int column = nearestPos.y();
 
-    tempQizi->setVisible(true);
-    tempQizi->setPixmap(qizi->getPixmap());
+    if (tempQizi != NULL)
+    {
+        tempQizi->setVisible(true);
+        tempQizi->setPixmap(qizi->getPixmap());
 
-    if (qizi->isMovable(row, column))
-    {
-        putQizi(tempQizi, row, column);
-    }
-    else
-    {
-        putQizi(tempQizi, qizi->getCurPos().x(), qizi->getCurPos().y());
+        if (qizi->isMovable(row, column))
+        {
+            putQizi(tempQizi, row, column);
+        }
+        else
+        {
+            putQizi(tempQizi, qizi->getCurPos().x(), qizi->getCurPos().y());
+        }
     }
 }
 
