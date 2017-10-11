@@ -11,7 +11,13 @@ public:
               HEI_ZU, HEI_PAO, HEI_CHE, HEI_MA, HEI_XIANG, HEI_SI, HEI_JIANG};
     explicit XYQiziWidget(TYPE type, int times, QWidget *parent = 0);
     ~XYQiziWidget();
-    QPoint getQiziPos(bool up);
+
+    // 获取棋子默认的位置
+    QPoint getQiziDefaultPos(bool up);
+
+    // 判断位置棋子是否可以走
+    bool isMovable(int row, int column);
+
     void setType(TYPE type, int times);
     TYPE getType() const;
 
@@ -40,7 +46,8 @@ private:
     int     times;
     bool    beEaten;
     QPixmap pixmap;
-    QPoint  curPos;    // 记录所在（行，列）
+    QPoint  curPos;        // 记录所在（行，列）
+    QPoint  defaultPos;    // 记录初始位置
 
 };
 

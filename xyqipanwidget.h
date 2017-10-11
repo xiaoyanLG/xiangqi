@@ -13,6 +13,7 @@ public:
     ~XYQipanWidget();
     void putQizi(XYQiziWidget *qizi, int row, int column);
     void moveToNearestPos(XYQiziWidget *qizi);
+    XYQiziWidget *getPositionQizi(int row, int column);
 
 signals:
     void sizeChanged(const QSize &size);
@@ -28,7 +29,6 @@ private:
     static XYQipanWidget *instance;
     QPixmap qipanPixmap;
     QPoint  allPos[10][9];
-    bool    alreadyOccupy[10][9];
     XYQiziWidget *qiziInqipan[10][9];
 
 };

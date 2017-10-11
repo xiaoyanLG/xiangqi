@@ -2,6 +2,7 @@
 #include "xyqipanwidget.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include <qmath.h>
 #include <QDebug>
 
 XYQiziWidget::XYQiziWidget(TYPE type, int times, QWidget *parent)
@@ -16,7 +17,7 @@ XYQiziWidget::~XYQiziWidget()
 
 }
 
-QPoint XYQiziWidget::getQiziPos(bool up)
+QPoint XYQiziWidget::getQiziDefaultPos(bool up)
 {
     int row = 0;
     int column = 0;
@@ -60,7 +61,205 @@ QPoint XYQiziWidget::getQiziPos(bool up)
     default:
         break;
     }
+    defaultPos = QPoint(row, column);
     return QPoint(row, column);
+}
+
+bool XYQiziWidget::isMovable(int row, int column)
+{
+    bool yes = false;
+    switch (type)
+    {
+    case HONG_ZU:
+    case HEI_ZU:
+        if (qAbs(row - curPos.x()) + qAbs(column - curPos.y()) == 1
+                && (defaultPos.x() <= 4 && row >= curPos.x()
+                    || defaultPos.x() >= 5 && row <= curPos.x()) )
+        {
+            yes = true;
+        }
+        break;
+    case HONG_PAO:
+    case HEI_PAO:
+        if (row == curPos.x())
+        {
+            int fuhao = column > curPos.y() ? 1 : -1;
+            int count = qAbs(column - curPos.y());
+            int obstacleTimes = 0;
+            for (int i = 1; i < count; ++i)
+            {
+                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                        ->getPositionQizi(curPos.x(), curPos.y() + fuhao * i);
+                if (obstacleQizi != NULL)
+                {
+                    obstacleTimes++;
+                }
+            }
+            XYQiziWidget *lastQizi = XYQipanWidget::getInstance()
+                    ->getPositionQizi(row, column);
+            if ((obstacleTimes == 1 && lastQizi != NULL)
+                    || (obstacleTimes == 0 && lastQizi == NULL))
+            {
+                yes = true;
+            }
+        }
+        else if (column == curPos.y())
+        {
+            int fuhao = row > curPos.x() ? 1 : -1;
+            int count = qAbs(row - curPos.x());
+            int obstacleTimes = 0;
+            for (int i = 1; i < count; ++i)
+            {
+                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                        ->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
+                if (obstacleQizi != NULL)
+                {
+                    obstacleTimes++;
+                }
+            }
+            XYQiziWidget *lastQizi = XYQipanWidget::getInstance()
+                    ->getPositionQizi(row, column);
+            if ((obstacleTimes == 1 && lastQizi != NULL)
+                    || (obstacleTimes == 0 && lastQizi == NULL))
+            {
+                yes = true;
+            }
+        }
+        break;
+    case HONG_CHE:
+    case HEI_CHE:
+        if (row == curPos.x())
+        {
+            int fuhao = column > curPos.y() ? 1 : -1;
+            int count = qAbs(column - curPos.y());
+            for (int i = 1; i < count; ++i)
+            {
+                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                        ->getPositionQizi(curPos.x(), curPos.y() + fuhao * i);
+                if (obstacleQizi != NULL)
+                {
+                    return false;
+                }
+            }
+            yes = true;
+        }
+        else if (column == curPos.y())
+        {
+            int fuhao = row > curPos.x() ? 1 : -1;
+            int count = qAbs(row - curPos.x());
+            for (int i = 1; i < count; ++i)
+            {
+                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                        ->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
+                if (obstacleQizi != NULL)
+                {
+                    return false;
+                }
+            }
+            yes = true;
+        }
+        break;
+    case HONG_MA:
+    case HEI_MA:
+        if (qAbs(row - curPos.x()) + qAbs(column - curPos.y()) == 3)
+        {
+            // 判断是否有挡路棋子
+            if (qAbs(row - curPos.x()) == 2)
+            {
+                int fuhao = row > curPos.x() ? 1 : -1;
+                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                        ->getPositionQizi(curPos.x() + fuhao, curPos.y());
+                if (obstacleQizi != NULL)
+                {
+                    return false;
+                }
+
+            }
+            else if (qAbs(column - curPos.y()) == 2)
+            {
+                int fuhao = column > curPos.y() ? 1 : -1;
+                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                        ->getPositionQizi(curPos.x(), curPos.y() + fuhao);
+                if (obstacleQizi != NULL)
+                {
+                    return false;
+                }
+            }
+            yes = true;
+        }
+        break;
+    case HONG_XIANG:
+    case HEI_XIANG:
+        if (qAbs(row - curPos.x()) == 2
+                && qAbs(column - curPos.y()) == 2
+                && (row <= 4 && curPos.x() <= 4
+                    || row >= 5 && curPos.x() >= 5) )
+        {
+            // 判断是否有挡路棋子
+            XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                    ->getPositionQizi((curPos.x() + row)/2, (curPos.y() + column)/2);
+            if (obstacleQizi != NULL)
+            {
+                return false;
+            }
+            yes = true;
+        }
+        break;
+    case HONG_SI:
+    case HEI_SI:
+        if (qAbs(row - curPos.x()) == 1
+                && qAbs(column - curPos.y()) == 1
+                && (column >= 3 && column <= 5)
+                && (row >= 7 || row <= 2) )
+        {
+            yes = true;
+        }
+        break;
+    case HONG_JIANG:
+    case HEI_JIANG:
+        if (qAbs(row - curPos.x()) + qAbs(column - curPos.y()) == 1
+                && (column >= 3 && column <= 5)
+                && (row >= 7 || row <= 2))
+        {
+            yes = true;
+        }
+        else
+        {
+            int fuhao = defaultPos.x() > 5 ? -1 : 1;
+            for (int i = 1; i <= 9
+                 && (curPos.x() + fuhao * i >= 0
+                     && curPos.x() + fuhao * i <= 9); ++i)
+            {
+                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                        ->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
+                if (obstacleQizi != NULL)
+                {
+                    if (obstacleQizi->getType() == HEI_JIANG
+                            || obstacleQizi->getType() == HONG_JIANG)
+                    {
+                        yes = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+    // 同一方的棋子不能覆盖
+    XYQiziWidget *lastQizi = XYQipanWidget::getInstance()->getPositionQizi(row, column);
+
+    if (lastQizi != NULL && (lastQizi->getType() <= HONG_JIANG && type <= HONG_JIANG
+            || lastQizi->getType() > HONG_JIANG && type > HONG_JIANG))
+    {
+        yes = false;
+    }
+    return yes;
 }
 
 void XYQiziWidget::setType(XYQiziWidget::TYPE type, int times)
@@ -188,6 +387,10 @@ bool XYQiziWidget::getBeEaten() const
 
 void XYQiziWidget::setBeEaten(bool beEaten)
 {
+    if (beEaten)
+    {
+        setVisible(false);
+    }
     this->beEaten = beEaten;
 }
 
