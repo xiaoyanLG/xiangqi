@@ -15,6 +15,8 @@ public:
     void putQizi(XYQiziWidget *qizi, int row, int column);
     void moveToNearestPos(XYQiziWidget *qizi);
     XYQiziWidget *getPositionQizi(int row, int column);
+    void setTempQizi(XYQiziWidget *qizi);
+    void showTempQizi(XYQiziWidget *qizi);
 
 signals:
     void sizeChanged(const QSize &size);
@@ -24,10 +26,12 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
+    QPoint getQiziCurNearestPos(XYQiziWidget *qizi);
     QPainterPath getPosPath(const QPointF &point, qreal w, int type); // type: 1, 2, 1|2
 
 private:
     static XYQipanWidget *instance;
+    XYQiziWidget *tempQizi;
     QPixmap qipanPixmap;
     QPoint  allPos[10][9];
     XYQiziWidget *qiziInqipan[10][9];

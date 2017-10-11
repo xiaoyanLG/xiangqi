@@ -58,6 +58,10 @@ QPoint XYQiziWidget::getQiziDefaultPos(bool up)
         row = up ? 0 : 9;
         column = 4;
         break;
+    case TEMP:
+        row = -1;
+        column = -1;
+        break;
     default:
         break;
     }
@@ -279,6 +283,10 @@ void XYQiziWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    if (type == TEMP)
+    {
+        painter.setOpacity(0.55);
+    }
     painter.drawPixmap(rect(), getPixMapByType(type));
 }
 
@@ -311,6 +319,7 @@ void XYQiziWidget::mouseMoveEvent(QMouseEvent *event)
         lastpos.setY( lastpos.y() + event->globalY() - moLastPos.y());
         move(lastpos);
         moLastPos = event->globalPos();
+        XYQipanWidget::getInstance()->showTempQizi(this);
     }
 }
 
@@ -363,6 +372,9 @@ QPixmap XYQiziWidget::getPixMapByType(XYQiziWidget::TYPE type, bool force)
         case HEI_JIANG:
             pixmap.load(":/xiangqi/hei_jiang.png");
             break;
+        case TEMP:
+            pixmap.load(":/xiangqi/hei_jiang.png");
+            break;
         default:
             break;
         }
@@ -371,6 +383,17 @@ QPixmap XYQiziWidget::getPixMapByType(XYQiziWidget::TYPE type, bool force)
 
     return this->pixmap;
 }
+
+QPixmap XYQiziWidget::getPixmap() const
+{
+    return pixmap;
+}
+
+void XYQiziWidget::setPixmap(const QPixmap &value)
+{
+    pixmap = value;
+}
+
 QPoint XYQiziWidget::getCurPos() const
 {
     return curPos;

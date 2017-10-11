@@ -32,6 +32,7 @@ protected:
 private:
     QList<XYQiziWidget *> hong_qizis;
     QList<XYQiziWidget *> hei_qizis;
+    XYQiziWidget *tempQizi;
     static MainWindow *instance;
     Ui::MainWindow *ui;
 };

@@ -41,57 +41,30 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column)
     qizi->move(allPos[row][column] -
             QPoint(qizi->width() / 2, qizi->height() / 2));
 
-    if (qiziInqipan[row][column] != NULL && qiziInqipan[row][column] != qizi)
+    if (qizi->getType() != XYQiziWidget::TEMP)
     {
-        qiziInqipan[row][column]->setBeEaten(true);
-    }
+        if (qiziInqipan[row][column] != NULL && qiziInqipan[row][column] != qizi)
+        {
+            qiziInqipan[row][column]->setBeEaten(true);
+        }
 
-    if (qizi->getCurPos().x() >= 0 && qizi->getCurPos().x() <= 9
-            && qizi->getCurPos().y() >= 0 && qizi->getCurPos().y() <= 8)
-    {
-        qiziInqipan[qizi->getCurPos().x()][qizi->getCurPos().y()] = NULL;
+        if (qizi->getCurPos().x() >= 0 && qizi->getCurPos().x() <= 9
+                && qizi->getCurPos().y() >= 0 && qizi->getCurPos().y() <= 8)
+        {
+            qiziInqipan[qizi->getCurPos().x()][qizi->getCurPos().y()] = NULL;
+        }
+        qiziInqipan[row][column] = qizi;
     }
-    qiziInqipan[row][column] = qizi;
 
     qizi->setCurPos(QPoint(row, column));
 }
 
 void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
 {
-    qreal w = qAbs(allPos[0][0].x() - allPos[0][1].x());
-    qreal h = qAbs(allPos[0][0].y() - allPos[1][0].y());
-
-    QPoint point = qizi->pos();
-    point.setX(point.x() + qizi->width() / 2);
-    point.setY(point.y() + qizi->height() / 2);
-
-    int row = 0;
-    int column = 0;
-    if (point.y() < 50)
-    {
-        row = 0;
-    }
-    else
-    {
-        row = qRound((point.y() - 50) / h);
-        if (row > 9)
-        {
-            row = 9;
-        }
-    }
-    if (point.x() < 50)
-    {
-        column = 0;
-    }
-    else
-    {
-        column = qRound((point.x() - 50) / w);
-        if (column > 8)
-        {
-            column = 8;
-        }
-    }
-
+    QPoint nearestPos = getQiziCurNearestPos(qizi);
+    int row = nearestPos.x();
+    int column = nearestPos.y();
+    tempQizi->setVisible(false);
     if (qizi->isMovable(row, column))
     {
         putQizi(qizi, row, column);
@@ -105,6 +78,30 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
 XYQiziWidget *XYQipanWidget::getPositionQizi(int row, int column)
 {
     return qiziInqipan[row][column];
+}
+
+void XYQipanWidget::setTempQizi(XYQiziWidget *qizi)
+{
+    tempQizi = qizi;
+}
+
+void XYQipanWidget::showTempQizi(XYQiziWidget *qizi)
+{
+    QPoint nearestPos = getQiziCurNearestPos(qizi);
+    int row = nearestPos.x();
+    int column = nearestPos.y();
+
+    tempQizi->setVisible(true);
+    tempQizi->setPixmap(qizi->getPixmap());
+
+    if (qizi->isMovable(row, column))
+    {
+        putQizi(tempQizi, row, column);
+    }
+    else
+    {
+        putQizi(tempQizi, qizi->getCurPos().x(), qizi->getCurPos().y());
+    }
 }
 
 void XYQipanWidget::paintEvent(QPaintEvent *event)
@@ -198,7 +195,7 @@ void XYQipanWidget::paintEvent(QPaintEvent *event)
     QRect cheheRect(curX, curY + 4 * h, w * 4, h);
     painter.drawText(cheheRect, QString::fromStdWString(L"楚河"), QTextOption(Qt::AlignCenter));
 
-    painter.translate(curX + w * 8, curY + 4.9 * h);
+    painter.translate(curX + w * 8, curY + 5.0 * h);
     painter.rotate(180);
     QRect hanjieRect(0, 0, w * 4, h);
     painter.drawText(hanjieRect, QString::fromStdWString(L"汉界"), QTextOption(Qt::AlignCenter));
@@ -221,6 +218,45 @@ void XYQipanWidget::resizeEvent(QResizeEvent *event)
 
     emit sizeChanged(event->size());
     QWidget::resizeEvent(event);
+}
+
+QPoint XYQipanWidget::getQiziCurNearestPos(XYQiziWidget *qizi)
+{
+    qreal w = qAbs(allPos[0][0].x() - allPos[0][1].x());
+    qreal h = qAbs(allPos[0][0].y() - allPos[1][0].y());
+
+    QPoint point = qizi->pos();
+    point.setX(point.x() + qizi->width() / 2);
+    point.setY(point.y() + qizi->height() / 2);
+
+    int row = 0;
+    int column = 0;
+    if (point.y() < 50)
+    {
+        row = 0;
+    }
+    else
+    {
+        row = qRound((point.y() - 50) / h);
+        if (row > 9)
+        {
+            row = 9;
+        }
+    }
+    if (point.x() < 50)
+    {
+        column = 0;
+    }
+    else
+    {
+        column = qRound((point.x() - 50) / w);
+        if (column > 8)
+        {
+            column = 8;
+        }
+    }
+
+    return QPoint(row, column);
 }
 
 QPainterPath XYQipanWidget::getPosPath(const QPointF &point, qreal w, int type)

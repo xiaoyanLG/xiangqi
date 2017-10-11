@@ -8,7 +8,7 @@ class XYQiziWidget : public QWidget
     Q_OBJECT
 public:
     enum TYPE{HONG_ZU, HONG_PAO, HONG_CHE, HONG_MA, HONG_XIANG, HONG_SI, HONG_JIANG,
-              HEI_ZU, HEI_PAO, HEI_CHE, HEI_MA, HEI_XIANG, HEI_SI, HEI_JIANG};
+              HEI_ZU, HEI_PAO, HEI_CHE, HEI_MA, HEI_XIANG, HEI_SI, HEI_JIANG, TEMP};
     explicit XYQiziWidget(TYPE type, int times, QWidget *parent = 0);
     ~XYQiziWidget();
 
@@ -26,6 +26,9 @@ public:
 
     QPoint getCurPos() const;
     void setCurPos(const QPoint &value);
+
+    QPixmap getPixmap() const;
+    void setPixmap(const QPixmap &value);
 
 public slots:
     void resizeQizi(const QSize &size);

@@ -71,6 +71,10 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
 
+    tempQizi = new XYQiziWidget(XYQiziWidget::TEMP, 0, this);
+    connect(ui->widget, SIGNAL(sizeChanged(QSize)), tempQizi, SLOT(resizeQizi(QSize)));
+
+    ui->widget->setTempQizi(tempQizi);
     instance = this;
     resize(1000, 800);
     layoutQizi();
