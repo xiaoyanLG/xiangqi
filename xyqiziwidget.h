@@ -11,15 +11,15 @@ public:
               HEI_ZU, HEI_PAO, HEI_CHE, HEI_MA, HEI_XIANG, HEI_SI, HEI_JIANG};
     explicit XYQiziWidget(TYPE type, int times, QWidget *parent = 0);
     ~XYQiziWidget();
-    QPoint getQiziPos();
+    QPoint getQiziPos(bool up);
     void setType(TYPE type, int times);
     TYPE getType() const;
 
-    QPoint getPos() const;
-    void setPos(const QPoint &pos);
-
     bool getBeEaten() const;
     void setBeEaten(bool beEaten);
+
+    QPoint getCurPos() const;
+    void setCurPos(const QPoint &value);
 
 public slots:
     void resizeQizi(const QSize &size);
@@ -36,11 +36,11 @@ protected:
     QPoint        moLastPos;
 
 private:
-    TYPE type;
-    int  times;
-    QPoint pos;
-    bool beEaten;
+    TYPE    type;
+    int     times;
+    bool    beEaten;
     QPixmap pixmap;
+    QPoint  curPos;    // 记录所在（行，列）
 
 };
 

@@ -1,7 +1,21 @@
 ﻿#include "xyqipanwidget.h"
 #include <QPainter>
 #include <QResizeEvent>
+#include <qmath.h>
 #include <QDebug>
+
+static qreal lengthToPoint(const QPoint &p1, const QPoint &p2)
+{
+    qreal x = qAbs(p1.x() - p2.x());
+    qreal y = qAbs(p1.y() - p2.y());
+    return qSqrt((x*x) + (y*y));
+}
+
+XYQipanWidget *XYQipanWidget::instance = NULL;
+XYQipanWidget *XYQipanWidget::getInstance()
+{
+    return instance;
+}
 
 XYQipanWidget::XYQipanWidget(QWidget *parent)
     : QWidget(parent)
@@ -9,6 +23,8 @@ XYQipanWidget::XYQipanWidget(QWidget *parent)
     memset(alreadyOccupy, 9*10, sizeof(bool));
     memset(qiziInqipan, 9*10, sizeof(XYQiziWidget *));
     qipanPixmap.load(":/xiangqi/qipan.png");
+
+    instance = this;
 }
 
 XYQipanWidget::~XYQipanWidget()
@@ -18,20 +34,55 @@ XYQipanWidget::~XYQipanWidget()
 
 void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column)
 {
-    qizi->setVisible(true);
     qizi->move(allPos[row][column] -
             QPoint(qizi->width() / 2, qizi->height() / 2));
 
-    if (alreadyOccupy[row][column] == true)
-    {
-        qiziInqipan[row][column]->setVisible(false);
-    }
     qiziInqipan[row][column] = qizi;
+
+    qizi->setCurPos(QPoint(row, column));
+}
+
+void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
+{
+    qreal w = qAbs(allPos[0][0].x() - allPos[0][1].x());
+    qreal h = qAbs(allPos[0][0].y() - allPos[1][0].y());
+
+    QPoint point = qizi->pos();
+    point.setX(point.x() + qizi->width() / 2);
+    point.setY(point.y() + qizi->height() / 2);
+
+    int row = 0;
+    int column = 0;
+    if (point.y() < 50)
+    {
+        row = 0;
+    }
+    else
+    {
+        row = qRound((point.y() - 50) / h);
+        if (row > 9)
+        {
+            row = 9;
+        }
+    }
+    if (point.x() < 50)
+    {
+        column = 0;
+    }
+    else
+    {
+        column = qRound((point.x() - 50) / w);
+        if (column > 8)
+        {
+            column = 8;
+        }
+    }
+
+    putQizi(qizi, row, column);
 }
 
 void XYQipanWidget::paintEvent(QPaintEvent *event)
 {
-    static QRect latestRect;
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing
                           | QPainter::TextAntialiasing
@@ -114,34 +165,34 @@ void XYQipanWidget::paintEvent(QPaintEvent *event)
 
     // 画文字
     QFont font = painter.font();
-    font.setPointSize(w * 0.6);
+    font.setPointSize(w * 0.55);
     font.setFamily(QString::fromStdWString(L"华文行楷"));
     painter.setFont(font);
 
     QRect cheheRect(curX, curY + 4 * h, w * 4, h);
     painter.drawText(cheheRect, QString::fromStdWString(L"楚河"), QTextOption(Qt::AlignCenter));
 
-    painter.translate(curX + w * 8, curY + 5 * h);
+    painter.translate(curX + w * 8, curY + 4.9 * h);
     painter.rotate(180);
     QRect hanjieRect(0, 0, w * 4, h);
     painter.drawText(hanjieRect, QString::fromStdWString(L"汉界"), QTextOption(Qt::AlignCenter));
-
-    // 获取棋盘位置
-    if (latestRect != rect())
-    {
-        latestRect == rect();
-        for (int i = 0; i < 10; ++i)
-        {
-            for (int j = 0; j < 9; ++j)
-            {
-                allPos[i][j] = QPoint(curX + j * w, curY + i * h);
-            }
-        }
-    }
 }
 
 void XYQipanWidget::resizeEvent(QResizeEvent *event)
 {
+    qreal w = (event->size().width() - 100) / 8;
+    qreal h = (event->size().height() - 100) / 9;
+    int curX = 50;
+    int curY = 50;
+    // 获取棋盘位置
+    for (int i = 0; i < 10; ++i)
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            allPos[i][j] = QPoint(curX + j * w, curY + i * h);
+        }
+    }
+
     emit sizeChanged(event->size());
     QWidget::resizeEvent(event);
 }
@@ -171,7 +222,6 @@ QPainterPath XYQipanWidget::getPosPath(const QPointF &point, qreal w, int type)
         path.lineTo(point.x() - spaceW, point.y() + spaceW);
         path.lineTo(point.x() - spaceW, point.y() + lineW);
     }
-
 
     return path;
 }

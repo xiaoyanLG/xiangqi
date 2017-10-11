@@ -54,8 +54,7 @@ void XYBattleInfoWidget::zoomIn()
 
 void XYBattleInfoWidget::zoomOut()
 {
-    MainWindow::getInstance()->testsssss();
-    //    MainWindow::getInstance()->resize(MainWindow::getInstance()->size() - QSize(50, 55));
+    MainWindow::getInstance()->resize(MainWindow::getInstance()->size() - QSize(50, 55));
 }
 
 void XYBattleInfoWidget::layoutQizi()

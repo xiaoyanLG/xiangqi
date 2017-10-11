@@ -104,17 +104,21 @@ void MainWindow::testsssss()
 
 void MainWindow::layoutQizi()
 {
+    static bool up = true;
     for (int i = 0; i < hong_qizis.size(); ++i)
     {
-        QPoint pos = hong_qizis.at(i)->getQiziPos();
+        QPoint pos = hong_qizis.at(i)->getQiziPos(up);
+        hong_qizis.at(i)->setVisible(true);
         ui->widget->putQizi(hong_qizis.at(i), pos.x(), pos.y());
     }
 
     for (int i = 0; i < hei_qizis.size(); ++i)
     {
-        QPoint pos = hei_qizis.at(i)->getQiziPos();
+        QPoint pos = hei_qizis.at(i)->getQiziPos(!up);
+        hei_qizis.at(i)->setVisible(true);
         ui->widget->putQizi(hei_qizis.at(i), pos.x(), pos.y());
     }
+    up = !up;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)

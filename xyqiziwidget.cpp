@@ -1,15 +1,8 @@
 ﻿#include "xyqiziwidget.h"
+#include "xyqipanwidget.h"
 #include <QPainter>
 #include <QMouseEvent>
-#include <qmath.h>
 #include <QDebug>
-
-static qreal lengthToPoint(const QPoint &p1, const QPoint &p2)
-{
-    qreal x = qAbs(p1.x() - p2.x());
-    qreal y = qAbs(p1.y() - p2.y());
-    return qSqrt((x*x) + (y*y));
-}
 
 XYQiziWidget::XYQiziWidget(TYPE type, int times, QWidget *parent)
     : QWidget(parent)
@@ -23,66 +16,45 @@ XYQiziWidget::~XYQiziWidget()
 
 }
 
-QPoint XYQiziWidget::getQiziPos()
+QPoint XYQiziWidget::getQiziPos(bool up)
 {
     int row = 0;
     int column = 0;
     switch (type)
     {
     case HONG_ZU:
-        row = 3;
+    case HEI_ZU:
+        row = up ? 3 : 6;
         column = 0 + 2 * times;
         break;
     case HONG_PAO:
-        row = 2;
+    case HEI_PAO:
+        row = up ? 2 : 7;
         column = 1 + 6 * times;
         break;
     case HONG_CHE:
-        row = 0;
+    case HEI_CHE:
+        row = up ? 0 : 9;
         column = 0 + 8 * times;
         break;
     case HONG_MA:
-        row = 0;
+    case HEI_MA:
+        row = up ? 0 : 9;
         column = 1 + 6 * times;
         break;
     case HONG_XIANG:
-        row = 0;
+    case HEI_XIANG:
+        row = up ? 0 : 9;
         column = 2 + 4 * times;
         break;
     case HONG_SI:
-        row = 0;
+    case HEI_SI:
+        row = up ? 0 : 9;
         column = 3 + 2 * times;
         break;
     case HONG_JIANG:
-        row = 0;
-        column = 4;
-        break;
-    case HEI_ZU:
-        row = 6;
-        column = 0 + 2 * times;
-        break;
-    case HEI_PAO:
-        row = 7;
-        column = 1 + 6 * times;
-        break;
-    case HEI_CHE:
-        row = 9;
-        column = 0 + 8 * times;
-        break;
-    case HEI_MA:
-        row = 9;
-        column = 1 + 6 * times;
-        break;
-    case HEI_XIANG:
-        row = 9;
-        column = 2 + 4 * times;
-        break;
-    case HEI_SI:
-        row = 9;
-        column = 3 + 2 * times;
-        break;
     case HEI_JIANG:
-        row = 9;
+        row = up ? 0 : 9;
         column = 4;
         break;
     default:
@@ -126,6 +98,7 @@ void XYQiziWidget::mouseReleaseEvent(QMouseEvent *event)
     {
         mbLeftMousePressed = false;
         moLastPos = event->globalPos();
+        XYQipanWidget::getInstance()->moveToNearestPos(this);
     }
 }
 
@@ -198,6 +171,16 @@ QPixmap XYQiziWidget::getPixMapByType(XYQiziWidget::TYPE type, bool force)
 
     return this->pixmap;
 }
+QPoint XYQiziWidget::getCurPos() const
+{
+    return curPos;
+}
+
+void XYQiziWidget::setCurPos(const QPoint &value)
+{
+    curPos = value;
+}
+
 bool XYQiziWidget::getBeEaten() const
 {
     return beEaten;
@@ -214,16 +197,6 @@ void XYQiziWidget::resizeQizi(const QSize &size)
     qreal ratio = 0.9 * size.width() / qipan.size().width();
     QPixmap qizi = getPixMapByType(type);
     resize(qizi.size() * ratio);
+
+    XYQipanWidget::getInstance()->putQizi(this, curPos.x(), curPos.y());
 }
-
-QPoint XYQiziWidget::getPos() const
-{
-    return pos;
-}
-
-void XYQiziWidget::setPos(const QPoint &pos)
-{
-    this->pos = pos;
-}
-
-

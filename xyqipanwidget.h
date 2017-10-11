@@ -8,9 +8,11 @@ class XYQipanWidget : public QWidget
 {
     Q_OBJECT
 public:
+    static XYQipanWidget *getInstance();
     explicit XYQipanWidget(QWidget *parent = 0);
     ~XYQipanWidget();
     void putQizi(XYQiziWidget *qizi, int row, int column);
+    void moveToNearestPos(XYQiziWidget *qizi);
 
 signals:
     void sizeChanged(const QSize &size);
@@ -22,7 +24,8 @@ protected:
 private:
     QPainterPath getPosPath(const QPointF &point, qreal w, int type); // type: 1, 2, 1|2
 
-public:
+private:
+    static XYQipanWidget *instance;
     QPixmap qipanPixmap;
     QPoint  allPos[10][9];
     bool    alreadyOccupy[10][9];
