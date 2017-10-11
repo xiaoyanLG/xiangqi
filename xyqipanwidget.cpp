@@ -31,6 +31,11 @@ XYQipanWidget::~XYQipanWidget()
 
 }
 
+void XYQipanWidget::clear()
+{
+    memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
+}
+
 void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column)
 {
     qizi->move(allPos[row][column] -
@@ -41,7 +46,11 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column)
         qiziInqipan[row][column]->setBeEaten(true);
     }
 
-    qiziInqipan[qizi->getCurPos().x()][qizi->getCurPos().y()] = NULL;
+    if (qizi->getCurPos().x() >= 0 && qizi->getCurPos().x() <= 9
+            && qizi->getCurPos().y() >= 0 && qizi->getCurPos().y() <= 8)
+    {
+        qiziInqipan[qizi->getCurPos().x()][qizi->getCurPos().y()] = NULL;
+    }
     qiziInqipan[row][column] = qizi;
 
     qizi->setCurPos(QPoint(row, column));

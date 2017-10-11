@@ -11,6 +11,7 @@ public:
     static XYQipanWidget *getInstance();
     explicit XYQipanWidget(QWidget *parent = 0);
     ~XYQipanWidget();
+    void clear();
     void putQizi(XYQiziWidget *qizi, int row, int column);
     void moveToNearestPos(XYQiziWidget *qizi);
     XYQiziWidget *getPositionQizi(int row, int column);

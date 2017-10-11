@@ -106,6 +106,7 @@ void MainWindow::testsssss()
 void MainWindow::layoutQizi()
 {
     static bool up = true;
+    ui->widget->clear();
     for (int i = 0; i < hong_qizis.size(); ++i)
     {
         QPoint pos = hong_qizis.at(i)->getQiziDefaultPos(up);

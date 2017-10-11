@@ -62,7 +62,8 @@ QPoint XYQiziWidget::getQiziDefaultPos(bool up)
         break;
     }
     defaultPos = QPoint(row, column);
-    return QPoint(row, column);
+    curPos = QPoint(-1, -1);
+    return defaultPos;
 }
 
 bool XYQiziWidget::isMovable(int row, int column)
