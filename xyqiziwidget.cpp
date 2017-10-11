@@ -224,30 +224,32 @@ bool XYQiziWidget::isMovable(int row, int column)
     case HEI_JIANG:
         if (qAbs(row - curPos.x()) + qAbs(column - curPos.y()) == 1
                 && (column >= 3 && column <= 5)
-                && (row >= 7 || row <= 2))
+                && ((defaultPos.x() > 5 && row >= 7)
+                || (defaultPos.x() < 5 && row <= 2)))
         {
             yes = true;
         }
-        else
+        else if (curPos.y() == column)
         {
-            int fuhao = defaultPos.x() > 5 ? -1 : 1;
-            for (int i = 1; i <= 9
-                 && (curPos.x() + fuhao * i >= 0
-                     && curPos.x() + fuhao * i <= 9); ++i)
+            int fuhao = row > curPos.x() ? 1 : -1;
+            int count = qAbs(row - curPos.x());
+            for (int i = 1; i < count; ++i)
             {
                 XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
                         ->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
                 if (obstacleQizi != NULL)
                 {
-                    if (obstacleQizi->getType() == HEI_JIANG
-                            || obstacleQizi->getType() == HONG_JIANG)
-                    {
-                        yes = true;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    return false;
+                }
+            }
+            XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
+                    ->getPositionQizi(row, column);
+            if (obstacleQizi != NULL)
+            {
+                if (obstacleQizi->getType() == HEI_JIANG
+                        || obstacleQizi->getType() == HONG_JIANG)
+                {
+                    yes = true;
                 }
             }
         }
