@@ -29,3 +29,5 @@ FORMS    += mainwindow.ui
 
 RESOURCES += \
     images/images.qrc
+
+RC_FILE = ico.rc
