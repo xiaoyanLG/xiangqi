@@ -2,7 +2,9 @@
 #define XYQIPANWIDGET_H
 
 #include <QWidget>
+#include <QStack>
 #include "xyqiziwidget.h"
+#include "xyqibu.h"
 
 class XYQipanWidget : public QWidget
 {
@@ -12,12 +14,14 @@ public:
     explicit XYQipanWidget(QWidget *parent = 0);
     ~XYQipanWidget();
     void clear();
-    void putQizi(XYQiziWidget *qizi, int row, int column);
+    void putQiziToDefaultPos(XYQiziWidget *qizi, bool up);
+    void putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory);
     void moveToNearestPos(XYQiziWidget *qizi);
     XYQiziWidget *getPositionQizi(int row, int column);
     void setTempQizi(XYQiziWidget *qizi);
     void raiseTempQizi();
     void showTempQizi(XYQiziWidget *qizi);
+    void revokeLastQibu();
 
 signals:
     void sizeChanged(const QSize &size);
@@ -36,6 +40,7 @@ private:
     QPixmap qipanPixmap;
     QPoint  allPos[10][9];
     XYQiziWidget *qiziInqipan[10][9];
+    QStack<XYQibu *> historyQibus;
 
 };
 

@@ -253,8 +253,8 @@ bool XYQiziWidget::isMovable(int row, int column)
                     ->getPositionQizi(row, column);
             if (obstacleQizi != NULL)
             {
-                if (obstacleQizi->getType() == HEI_JIANG
-                        || obstacleQizi->getType() == HONG_JIANG)
+                if (obstacleQizi->type == HEI_JIANG
+                        || obstacleQizi->type == HONG_JIANG)
                 {
                     yes = true;
                 }
@@ -268,8 +268,8 @@ bool XYQiziWidget::isMovable(int row, int column)
     // 同一方的棋子不能覆盖
     XYQiziWidget *lastQizi = XYQipanWidget::getInstance()->getPositionQizi(row, column);
 
-    if (lastQizi != NULL && (lastQizi->getType() <= HONG_JIANG && type <= HONG_JIANG
-            || lastQizi->getType() > HONG_JIANG && type > HONG_JIANG))
+    if (lastQizi != NULL && (lastQizi->type <= HONG_JIANG && type <= HONG_JIANG
+            || lastQizi->type > HONG_JIANG && type > HONG_JIANG))
     {
         yes = false;
     }
@@ -425,6 +425,10 @@ void XYQiziWidget::setBeEaten(bool beEaten)
     {
         setVisible(false);
     }
+    else
+    {
+        setVisible(true);
+    }
     this->beEaten = beEaten;
 }
 
@@ -435,5 +439,5 @@ void XYQiziWidget::resizeQizi(const QSize &size)
     QPixmap qizi = getPixMapByType(type);
     resize(qizi.size() * ratio);
 
-    XYQipanWidget::getInstance()->putQizi(this, curPos.x(), curPos.y());
+    XYQipanWidget::getInstance()->putQizi(this, curPos.x(), curPos.y(), false);
 }

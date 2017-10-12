@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     xyqipanwidget.cpp \
     xybattleinfowidget.cpp \
-    xyqiziwidget.cpp
+    xyqiziwidget.cpp \
+    xyqibu.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
     xybattleinfowidget.h \
-    xyqiziwidget.h
+    xyqiziwidget.h \
+    xyqibu.h
 
 FORMS    += mainwindow.ui
 

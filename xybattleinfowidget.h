@@ -18,6 +18,10 @@ private slots:
     void zoomIn();
     void zoomOut();
     void layoutQizi();
+    void revoked();
+
+private:
+    QPixmap qipanPixmap;
 
 };
 

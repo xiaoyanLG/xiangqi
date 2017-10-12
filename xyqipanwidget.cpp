@@ -34,29 +34,65 @@ XYQipanWidget::~XYQipanWidget()
 void XYQipanWidget::clear()
 {
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
+    historyQibus.clear();
 }
 
-void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column)
+void XYQipanWidget::putQiziToDefaultPos(XYQiziWidget *qizi, bool up)
 {
+    QPoint defaultPos = qizi->getQiziDefaultPos(up);
+    int row = defaultPos.x();
+    int column = defaultPos.y();
     qizi->move(allPos[row][column] -
             QPoint(qizi->width() / 2, qizi->height() / 2));
 
-    if (qizi->getType() != XYQiziWidget::TEMP)
+    if (qizi->type != XYQiziWidget::TEMP)
     {
         if (qiziInqipan[row][column] != NULL && qiziInqipan[row][column] != qizi)
         {
             qiziInqipan[row][column]->setBeEaten(true);
         }
 
-        if (qizi->getCurPos().x() >= 0 && qizi->getCurPos().x() <= 9
-                && qizi->getCurPos().y() >= 0 && qizi->getCurPos().y() <= 8)
+        if (qizi->curPos.x() >= 0 && qizi->curPos.x() <= 9
+                && qizi->curPos.y() >= 0 && qizi->curPos.y() <= 8)
         {
-            qiziInqipan[qizi->getCurPos().x()][qizi->getCurPos().y()] = NULL;
+            qiziInqipan[qizi->curPos.x()][qizi->curPos.y()] = NULL;
         }
         qiziInqipan[row][column] = qizi;
     }
 
-    qizi->setCurPos(QPoint(row, column));
+    qizi->curPos = QPoint(row, column);
+}
+
+void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory)
+{
+    XYQiziWidget *eaten = NULL;
+    QPoint lastPos = qizi->curPos;
+    qizi->move(allPos[row][column] -
+            QPoint(qizi->width() / 2, qizi->height() / 2));
+
+    if (qizi->type != XYQiziWidget::TEMP)
+    {
+        if (qiziInqipan[row][column] != NULL && qiziInqipan[row][column] != qizi)
+        {
+            qiziInqipan[row][column]->setBeEaten(true);
+            eaten = qiziInqipan[row][column];
+        }
+
+        if (qizi->curPos.x() >= 0 && qizi->curPos.x() <= 9
+                && qizi->curPos.y() >= 0 && qizi->curPos.y() <= 8)
+        {
+            qiziInqipan[qizi->curPos.x()][qizi->curPos.y()] = NULL;
+        }
+        qiziInqipan[row][column] = qizi;
+    }
+
+    qizi->curPos = QPoint(row, column);
+
+    if (addHistory)
+    {
+        XYQibu *curQibu = new XYQibu(qizi, lastPos, eaten);
+        historyQibus.push(curQibu);
+    }
 }
 
 void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
@@ -70,11 +106,11 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
     }
     if (qizi->isMovable(row, column))
     {
-        putQizi(qizi, row, column);
+        putQizi(qizi, row, column, true);
     }
     else
     {
-        putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y());
+        putQizi(qizi, qizi->curPos.x(), qizi->curPos.y(), false);
     }
 }
 
@@ -105,16 +141,35 @@ void XYQipanWidget::showTempQizi(XYQiziWidget *qizi)
     if (tempQizi != NULL)
     {
         tempQizi->setVisible(true);
-        tempQizi->setPixmap(qizi->getPixmap());
+        tempQizi->pixmap = qizi->pixmap;
 
         if (qizi->isMovable(row, column))
         {
-            putQizi(tempQizi, row, column);
+            putQizi(tempQizi, row, column, false);
         }
         else
         {
-            putQizi(tempQizi, qizi->getCurPos().x(), qizi->getCurPos().y());
+            putQizi(tempQizi, qizi->curPos.x(), qizi->curPos.y(), false);
         }
+    }
+}
+
+void XYQipanWidget::revokeLastQibu()
+{
+
+    if (!historyQibus.isEmpty())
+    {
+        XYQibu *last = historyQibus.pop();
+        if (last->target != NULL)
+        {
+            putQizi(last->target, last->curPos.x(), last->curPos.y(), false);
+        }
+        if (last->eatenQizi != NULL)
+        {
+            last->eatenQizi->setBeEaten(false);
+            putQizi(last->eatenQizi, last->eatenQizi->curPos.x(), last->eatenQizi->curPos.y(), false);
+        }
+        delete last;
     }
 }
 

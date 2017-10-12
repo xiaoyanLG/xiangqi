@@ -52,6 +52,8 @@ private:
     QPoint  curPos;        // 记录所在（行，列）
     QPoint  defaultPos;    // 记录初始位置
 
+    friend class XYQipanWidget;
+
 };
 
 #endif // XYQIZIWIDGET_H

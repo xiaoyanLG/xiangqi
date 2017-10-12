@@ -1,5 +1,6 @@
 ﻿#include "xybattleinfowidget.h"
 #include "mainwindow.h"
+#include "xyqipanwidget.h"
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -18,11 +19,16 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     connect(ZoomOutBtn, SIGNAL(clicked()), this, SLOT(zoomOut()));
     QPushButton *layoutBtn = new QPushButton(QString::fromStdWString(L"布棋"));
     connect(layoutBtn, SIGNAL(clicked()), this, SLOT(layoutQizi()));
+    QPushButton *revokedBtn = new QPushButton(QString::fromStdWString(L"悔棋"));
+    connect(revokedBtn, SIGNAL(clicked()), this, SLOT(revoked()));
 
+    layout->addWidget(revokedBtn);
     layout->addWidget(layoutBtn);
     layout->addWidget(ZoomOutBtn);
     layout->addWidget(ZoomInBtn);
     layout->addWidget(closeBtn);
+
+    qipanPixmap.load(":/xiangqi/qipan.png");
 }
 
 XYBattleInfoWidget::~XYBattleInfoWidget()
@@ -32,7 +38,13 @@ XYBattleInfoWidget::~XYBattleInfoWidget()
 
 void XYBattleInfoWidget::paintEvent(QPaintEvent *event)
 {
-
+    QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing
+                          | QPainter::TextAntialiasing
+                          | QPainter::SmoothPixmapTransform);
+    painter.drawPixmap(rect(), qipanPixmap, QRect(10, 10,
+                                                  qipanPixmap.width() - 20,
+                                                  qipanPixmap.height() - 20));
 }
 
 void XYBattleInfoWidget::exit()
@@ -60,5 +72,10 @@ void XYBattleInfoWidget::zoomOut()
 void XYBattleInfoWidget::layoutQizi()
 {
     MainWindow::getInstance()->layoutQizi();
+}
+
+void XYBattleInfoWidget::revoked()
+{
+    XYQipanWidget::getInstance()->revokeLastQibu();
 }
 

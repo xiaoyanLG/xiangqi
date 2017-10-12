@@ -113,16 +113,14 @@ void MainWindow::layoutQizi()
     ui->widget->clear();
     for (int i = 0; i < hong_qizis.size(); ++i)
     {
-        QPoint pos = hong_qizis.at(i)->getQiziDefaultPos(up);
         hong_qizis.at(i)->setVisible(true);
-        ui->widget->putQizi(hong_qizis.at(i), pos.x(), pos.y());
+        ui->widget->putQiziToDefaultPos(hong_qizis.at(i), up);
     }
 
     for (int i = 0; i < hei_qizis.size(); ++i)
     {
-        QPoint pos = hei_qizis.at(i)->getQiziDefaultPos(!up);
         hei_qizis.at(i)->setVisible(true);
-        ui->widget->putQizi(hei_qizis.at(i), pos.x(), pos.y());
+        ui->widget->putQiziToDefaultPos(hei_qizis.at(i), !up);
     }
     up = !up;
 }
