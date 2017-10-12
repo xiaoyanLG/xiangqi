@@ -34,6 +34,7 @@ XYQipanWidget::~XYQipanWidget()
 void XYQipanWidget::clear()
 {
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
+    qDeleteAll(historyQibus);
     historyQibus.clear();
 }
 
