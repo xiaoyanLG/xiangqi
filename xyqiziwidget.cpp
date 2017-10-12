@@ -81,7 +81,14 @@ bool XYQiziWidget::isMovable(int row, int column)
                 && (defaultPos.x() <= 4 && row >= curPos.x()
                     || defaultPos.x() >= 5 && row <= curPos.x()) )
         {
-            yes = true;
+            // 没有过河不能左右移动
+            if ((defaultPos.x() <= 4 && row <= 4 && defaultPos.y() == column)
+                    || (defaultPos.x() >= 5 && row >= 5 && defaultPos.y() == column)
+                    || (defaultPos.x() <= 4 && row >= 5)
+                    || (defaultPos.x() >= 5 && row <= 4) )
+            {
+                yes = true;
+            }
         }
         break;
     case HONG_PAO:
