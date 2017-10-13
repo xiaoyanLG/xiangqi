@@ -22,6 +22,14 @@ MainWindow::MainWindow(QWidget *parent) :
                    | Qt::WindowSystemMenuHint
                    | Qt::WindowMinimizeButtonHint);
 
+    // 管理网络连接
+    connect(&client, SIGNAL(newMessage(QString,QString)),
+            this, SLOT(appendMessage(QString,QString)));
+    connect(&client, SIGNAL(newParticipant(QString)),
+            this, SLOT(newParticipant(QString)));
+    connect(&client, SIGNAL(participantLeft(QString)),
+            this, SLOT(participantLeft(QString)));
+
     for (int i = XYQiziWidget::HONG_ZU; i <= XYQiziWidget::HONG_JIANG; ++i)
     {
         int times = 0;
@@ -123,6 +131,21 @@ void MainWindow::layoutQizi()
         ui->widget->putQiziToDefaultPos(hei_qizis.at(i), !up);
     }
     up = !up;
+}
+
+void MainWindow::appendMessage(const QString &from, const QString &message)
+{
+    qDebug() << __FUNCTION__;
+}
+
+void MainWindow::newParticipant(const QString &nick)
+{
+    qDebug() << __FUNCTION__;
+}
+
+void MainWindow::participantLeft(const QString &nick)
+{
+    qDebug() << __FUNCTION__;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)

@@ -4,26 +4,35 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = xiangqiWidget
 TEMPLATE = app
 
+INCLUDEPATH += socket
 
 SOURCES += main.cpp\
         mainwindow.cpp \
     xyqipanwidget.cpp \
     xybattleinfowidget.cpp \
     xyqiziwidget.cpp \
-    xyqibu.cpp
+    xyqibu.cpp \
+    socket/client.cpp \
+    socket/connection.cpp \
+    socket/peermanager.cpp \
+    socket/server.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
     xybattleinfowidget.h \
     xyqiziwidget.h \
-    xyqibu.h
+    xyqibu.h \
+    socket/client.h \
+    socket/connection.h \
+    socket/peermanager.h \
+    socket/server.h
 
 FORMS    += mainwindow.ui
 

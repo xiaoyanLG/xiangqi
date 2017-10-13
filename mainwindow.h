@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "client.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,6 +20,9 @@ public:
 
 public slots:
     void layoutQizi();
+    void appendMessage(const QString &from, const QString &message);
+    void newParticipant(const QString &nick);
+    void participantLeft(const QString &nick);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -30,6 +34,7 @@ protected:
     QPoint        moLastPos;
 
 private:
+    Client client;
     QList<XYQiziWidget *> hong_qizis;
     QList<XYQiziWidget *> hei_qizis;
     XYQiziWidget *tempQizi;
