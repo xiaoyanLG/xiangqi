@@ -123,6 +123,8 @@ void PeerManager::sendBroadcastDatagram()
         if (broadcastSocket.writeDatagram(datagram, address,
                                           broadcastPort) == -1)
             validBroadcastAddresses = false;
+        else
+            break;
     }
 
     if (!validBroadcastAddresses)
