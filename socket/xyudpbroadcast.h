@@ -13,12 +13,12 @@ public:
     static QString getUserName();
     void writeUplineDatagram();
     void writeOfflineDatagram();
-    void writeUserDatagram(const QHostAddress &address, const QString &data);
+    void writeUserDatagram(const QHostAddress &address, const QByteArray &data, int type);
 
 signals:
     void peopleUpline(const QString &name, const QHostAddress &address);
     void peopleOffline(const QString &name, const QHostAddress &address);
-    void receiveData(const QString &from, const QString &data);
+    void receiveData(const QString &from, const QByteArray &data, int type);
 
 public slots:
     bool isLocalHostAddress(const QHostAddress &address);

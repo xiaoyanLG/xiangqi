@@ -101,16 +101,16 @@ void XYUdpbroadcast::writeOfflineDatagram()
     writeDatagram(offlineDatagram, QHostAddress(QHostAddress::Broadcast), port);
 }
 
-void XYUdpbroadcast::writeUserDatagram(const QHostAddress &address, const QString &data)
+void XYUdpbroadcast::writeUserDatagram(const QHostAddress &address, const QByteArray &data, int type)
 {
     QByteArray userDataDatagram;
     QDataStream out(&userDataDatagram, QIODevice::WriteOnly);
 
-    out << qint64(USERDATA)
+    out << qint64(USERDATA + type)
         << qint64(userName.toUtf8().size())
         << userName.toUtf8()
-        << qint64(data.toUtf8().size())
-        << data.toUtf8();
+        << qint64(data.size())
+        << data;
 
     writeDatagram(userDataDatagram, address, port);
 }
@@ -159,8 +159,7 @@ void XYUdpbroadcast::receiveBroadcast()
         case OFFLINE:
             emit peopleOffline(QString::fromUtf8(validData), sender);
             break;
-        case USERDATA:
-        {
+        default:
             if (!isLocalHostAddress(sender))
             {
                 QByteArray userData;
@@ -169,15 +168,10 @@ void XYUdpbroadcast::receiveBroadcast()
                 {
                     return;
                 }
-                emit receiveData(validData, userData);
+                emit receiveData(validData, userData, type - USERDATA);
             }
             break;
         }
-        default:
-            return;
-        }
-
-
     }
 }
 

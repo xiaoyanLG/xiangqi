@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->widget_2, SLOT(peopleUpline(QString,QHostAddress)));
     connect(me, SIGNAL(peopleOffline(QString,QHostAddress)),
             ui->widget_2, SLOT(peopleOffline(QString,QHostAddress)));
-    connect(me, SIGNAL(receiveData(QString,QString)),
+    connect(me, SIGNAL(receiveMessage(QString,QString)),
             ui->widget_2, SLOT(receiveData(QString,QString)));
 
     connect(ui->widget_2, SIGNAL(sendMessage(QHostAddress,QString)),
