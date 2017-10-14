@@ -22,14 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
                    | Qt::WindowSystemMenuHint
                    | Qt::WindowMinimizeButtonHint);
 
-    // 管理网络连接
-    connect(&client, SIGNAL(newMessage(QString,QString)),
-            this, SLOT(appendMessage(QString,QString)));
-    connect(&client, SIGNAL(newParticipant(QString)),
-            this, SLOT(newParticipant(QString)));
-    connect(&client, SIGNAL(participantLeft(QString)),
-            this, SLOT(participantLeft(QString)));
-
     for (int i = XYQiziWidget::HONG_ZU; i <= XYQiziWidget::HONG_JIANG; ++i)
     {
         int times = 0;
@@ -79,10 +71,22 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
 
+    // 准备临时棋子
     tempQizi = new XYQiziWidget(XYQiziWidget::TEMP, 0, this);
     connect(ui->widget, SIGNAL(sizeChanged(QSize)), tempQizi, SLOT(resizeQizi(QSize)));
-
     ui->widget->setTempQizi(tempQizi);
+
+    // 创建棋手
+    me = new XYQishou(this);
+    connect(me, SIGNAL(peopleUpline(QString,QHostAddress)),
+            ui->widget_2, SLOT(peopleUpline(QString,QHostAddress)));
+    connect(me, SIGNAL(peopleOffline(QString,QHostAddress)),
+            ui->widget_2, SLOT(peopleOffline(QString,QHostAddress)));
+    connect(me, SIGNAL(receiveData(QString,QString)),
+            ui->widget_2, SLOT(receiveData(QString,QString)));
+
+    connect(ui->widget_2, SIGNAL(sendMessage(QHostAddress,QString)),
+            me, SLOT(sendMessage(QHostAddress,QString)));
     instance = this;
     resize(1000, 800);
     layoutQizi();

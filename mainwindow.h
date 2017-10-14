@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "client.h"
+#include "xyqishou.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,7 +34,7 @@ protected:
     QPoint        moLastPos;
 
 private:
-    Client client;
+    XYQishou *me;
     QList<XYQiziWidget *> hong_qizis;
     QList<XYQiziWidget *> hei_qizis;
     XYQiziWidget *tempQizi;

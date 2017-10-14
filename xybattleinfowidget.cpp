@@ -5,6 +5,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QListWidget>
+#include <QTextEdit>
+#include <QLineEdit>
 
 XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     : QWidget(parent)
@@ -27,6 +30,8 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
                 }";
     this->setStyleSheet(qss0);
 
+    allOnlinePeoplesWidget = new QListWidget;
+    allOnlinePeoplesWidget->setFixedWidth(150);
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QPushButton *closeBtn = new QPushButton(QString::fromStdWString(L"退出"));
@@ -45,14 +50,22 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     revokedBtn->setFixedSize(150, 30);
     connect(revokedBtn, SIGNAL(clicked()), this, SLOT(revoked()));
 
-    layout->addStretch();
-    layout->setContentsMargins(25, 0, 0, 0);
+    sendMessageEdit = new QLineEdit;
+    sendMessageEdit->setFixedWidth(150);
+    connect(sendMessageEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+    messageBox = new QTextEdit;
+    messageBox->setFixedWidth(150);
+
+    layout->setContentsMargins(25, 20, 0, 30);
+
+    layout->addWidget(allOnlinePeoplesWidget, 1);
     layout->addWidget(revokedBtn);
     layout->addWidget(layoutBtn);
     layout->addWidget(ZoomOutBtn);
     layout->addWidget(ZoomInBtn);
     layout->addWidget(closeBtn);
-    layout->addStretch();
+    layout->addWidget(messageBox, 1);
+    layout->addWidget(sendMessageEdit);
 
     qipanPixmap.load(":/xiangqi/qipan.png");
 }
@@ -71,6 +84,47 @@ void XYBattleInfoWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(rect(), qipanPixmap, QRect(10, 10,
                                                   qipanPixmap.width() - 20,
                                                   qipanPixmap.height() - 20));
+}
+
+void XYBattleInfoWidget::peopleUpline(const QString &name, const QHostAddress &address)
+{
+    // 判断是否重复
+    QMap<int, QHostAddress>::iterator it = allPeoplesMap.begin();
+
+    while (it != allPeoplesMap.end())
+    {
+        const QHostAddress &address_in = it.value();
+        if (address_in == address)
+        {
+            return;
+        }
+        ++it;
+    }
+
+    QListWidgetItem *item = new QListWidgetItem(name);
+    allOnlinePeoplesWidget->addItem(item);
+    allPeoplesMap.insert(allOnlinePeoplesWidget->row(item), address);
+}
+
+void XYBattleInfoWidget::peopleOffline(const QString &name, const QHostAddress &address)
+{
+    QMap<int, QHostAddress>::iterator it = allPeoplesMap.begin();
+
+    while (it != allPeoplesMap.end())
+    {
+        const QHostAddress &address_in = it.value();
+        if (address_in == address)
+        {
+            allOnlinePeoplesWidget->takeItem(it.key());
+        }
+        ++it;
+    }
+}
+
+void XYBattleInfoWidget::receiveData(const QString &from, const QString &data)
+{
+    messageBox->setTextColor("blue");
+    messageBox->append(from + ": " + data);
 }
 
 void XYBattleInfoWidget::exit()
@@ -105,3 +159,16 @@ void XYBattleInfoWidget::revoked()
     XYQipanWidget::getInstance()->revokeLastQibu();
 }
 
+void XYBattleInfoWidget::sendMessage()
+{
+    QString data = sendMessageEdit->text();
+    QHostAddress address = allPeoplesMap.value(allOnlinePeoplesWidget->currentRow());
+    if (address.isNull())
+    {
+        address = QHostAddress(QHostAddress::Broadcast);
+    }
+
+    messageBox->setTextColor("green");
+    messageBox->append(QStringLiteral("你说") + ": " + data);
+    emit sendMessage(address, data);
+}

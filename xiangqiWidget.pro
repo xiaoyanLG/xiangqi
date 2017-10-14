@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     socket/client.cpp \
     socket/connection.cpp \
     socket/peermanager.cpp \
-    socket/server.cpp
+    socket/server.cpp \
+    socket/xyudpbroadcast.cpp \
+    xyqishou.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
@@ -32,7 +34,9 @@ HEADERS  += mainwindow.h \
     socket/client.h \
     socket/connection.h \
     socket/peermanager.h \
-    socket/server.h
+    socket/server.h \
+    socket/xyudpbroadcast.h \
+    xyqishou.h
 
 FORMS    += mainwindow.ui
 
