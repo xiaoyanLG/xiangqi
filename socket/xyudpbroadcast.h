@@ -10,6 +10,7 @@ public:
     enum DATATYPE {ONLINE = 45953, OFFLINE = 45954, USERDATA = 45955};
     explicit XYUdpbroadcast(QObject *parent = 0);
     ~XYUdpbroadcast();
+    static QString getUserName();
     void writeUplineDatagram();
     void writeOfflineDatagram();
     void writeUserDatagram(const QHostAddress &address, const QString &data);
@@ -24,8 +25,8 @@ public slots:
     void receiveBroadcast();
 
 private:
+    static QString      userName;
     QList<QHostAddress> ipAddresses;
-    QString  userName;
     int      port;
 };
 

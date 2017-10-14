@@ -3,6 +3,7 @@
 #include <QNetworkInterface>
 #include <QDataStream>
 
+QString XYUdpbroadcast::userName;
 XYUdpbroadcast::XYUdpbroadcast(QObject *parent)
     : QUdpSocket(parent), port(45954)
 {
@@ -50,6 +51,31 @@ XYUdpbroadcast::~XYUdpbroadcast()
 
 }
 
+QString XYUdpbroadcast::getUserName()
+{
+    // 获取用户名
+    if (userName.isEmpty())
+    {
+        QStringList envVariables;
+        envVariables << "USERNAME.*" << "USER.*" << "USERDOMAIN.*"
+                     << "HOSTNAME.*" << "DOMAINNAME.*";
+
+        QStringList environment = QProcess::systemEnvironment();
+
+        foreach (QString string, envVariables) {
+            int index = environment.indexOf(QRegExp(string));
+            if (index != -1) {
+                QStringList stringList = environment.at(index).split('=');
+                if (stringList.size() == 2) {
+                    userName = stringList.at(1).toUtf8();
+                    break;
+                }
+            }
+        }
+    }
+    return userName;
+}
+
 void XYUdpbroadcast::writeUplineDatagram()
 {
     QByteArray uplineDatagram;
@@ -77,8 +103,8 @@ void XYUdpbroadcast::writeOfflineDatagram()
 
 void XYUdpbroadcast::writeUserDatagram(const QHostAddress &address, const QString &data)
 {
-    QByteArray offlineDatagram;
-    QDataStream out(&offlineDatagram, QIODevice::WriteOnly);
+    QByteArray userDataDatagram;
+    QDataStream out(&userDataDatagram, QIODevice::WriteOnly);
 
     out << qint64(USERDATA)
         << qint64(userName.toUtf8().size())
@@ -86,7 +112,7 @@ void XYUdpbroadcast::writeUserDatagram(const QHostAddress &address, const QStrin
         << qint64(data.toUtf8().size())
         << data.toUtf8();
 
-    writeDatagram(offlineDatagram, address, port);
+    writeDatagram(userDataDatagram, address, port);
 }
 
 bool XYUdpbroadcast::isLocalHostAddress(const QHostAddress &address)

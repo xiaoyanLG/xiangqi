@@ -68,6 +68,8 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     layout->addWidget(sendMessageEdit);
 
     qipanPixmap.load(":/xiangqi/qipan.png");
+
+    allOnlinePeoplesWidget->addItem(XYUdpbroadcast::getUserName());
 }
 
 XYBattleInfoWidget::~XYBattleInfoWidget()
