@@ -1,6 +1,7 @@
 ﻿#include "xyudpbroadcast.h"
 #include <QProcess>
 #include <QNetworkInterface>
+#include <QDataStream>
 
 XYUdpbroadcast::XYUdpbroadcast(QObject *parent)
     : QUdpSocket(parent), port(45954)
@@ -55,8 +56,8 @@ void XYUdpbroadcast::writeUplineDatagram()
     QDataStream out(&uplineDatagram, QIODevice::WriteOnly);
 
     out << qint64(ONLINE)
-        << qint64(userName.toLocal8Bit().size())
-        << userName.toLocal8Bit();
+        << qint64(userName.toUtf8().size())
+        << userName.toUtf8();
 
     writeDatagram(uplineDatagram, QHostAddress(QHostAddress::Broadcast), port);
 
@@ -68,8 +69,8 @@ void XYUdpbroadcast::writeOfflineDatagram()
     QDataStream out(&offlineDatagram, QIODevice::WriteOnly);
 
     out << qint64(OFFLINE)
-        << qint64(userName.toLocal8Bit().size())
-        << userName.toLocal8Bit();
+        << qint64(userName.toUtf8().size())
+        << userName.toUtf8();
 
     writeDatagram(offlineDatagram, QHostAddress(QHostAddress::Broadcast), port);
 }
@@ -80,10 +81,10 @@ void XYUdpbroadcast::writeUserDatagram(const QHostAddress &address, const QStrin
     QDataStream out(&offlineDatagram, QIODevice::WriteOnly);
 
     out << qint64(USERDATA)
-        << qint64(userName.toLocal8Bit().size())
-        << userName.toLocal8Bit()
-        << qint64(data.toLocal8Bit().size())
-        << data.toLocal8Bit();
+        << qint64(userName.toUtf8().size())
+        << userName.toUtf8()
+        << qint64(data.toUtf8().size())
+        << data.toUtf8();
 
     writeDatagram(offlineDatagram, address, port);
 }
@@ -91,7 +92,7 @@ void XYUdpbroadcast::writeUserDatagram(const QHostAddress &address, const QStrin
 bool XYUdpbroadcast::isLocalHostAddress(const QHostAddress &address)
 {
     foreach (QHostAddress localAddress, ipAddresses) {
-        if (address == localAddress)
+        if (address.toIPv4Address() == localAddress.toIPv4Address())
             return true;
     }
     return false;
@@ -126,11 +127,11 @@ void XYUdpbroadcast::receiveBroadcast()
         case ONLINE:
             if (!isLocalHostAddress(sender))
             {
-                emit peopleUpline(QString::fromLocal8Bit(validData), sender);
+                emit peopleUpline(QString::fromUtf8(validData), sender);
             }
             break;
         case OFFLINE:
-            emit peopleOffline(QString::fromLocal8Bit(validData), sender);
+            emit peopleOffline(QString::fromUtf8(validData), sender);
             break;
         case USERDATA:
         {
