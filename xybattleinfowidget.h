@@ -32,6 +32,7 @@ private slots:
     void zoomOut();
     void layoutQizi();
     void revoked();
+    void switchViews();
     void sendMessage();
 
 private:

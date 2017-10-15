@@ -1,4 +1,5 @@
 ﻿#include "xyqipanwidget.h"
+#include "xyqishou.h"
 #include <QPainter>
 #include <QResizeEvent>
 #include <qmath.h>
@@ -31,11 +32,14 @@ XYQipanWidget::~XYQipanWidget()
 
 }
 
-void XYQipanWidget::clear()
+void XYQipanWidget::clear(bool clearHistory)
 {
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
-    qDeleteAll(historyQibus);
-    historyQibus.clear();
+    if (clearHistory)
+    {
+        qDeleteAll(historyQibus);
+        historyQibus.clear();
+    }
 }
 
 void XYQipanWidget::putQiziToDefaultPos(XYQiziWidget *qizi, bool up)
@@ -105,8 +109,10 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
     {
         tempQizi->setVisible(false);
     }
-    if (qizi->isMovable(row, column))
+    if (qizi->isMovable(row, column)
+            && XYQishou::getInstance()->getSideType() == qizi->getSideType())
     {
+        XYQishou::getInstance()->moveQizi(qizi, QPoint(row, column));
         putQizi(qizi, row, column, true);
     }
     else
@@ -172,6 +178,21 @@ void XYQipanWidget::revokeLastQibu()
         }
         delete last;
     }
+}
+
+void XYQipanWidget::switchViews()
+{
+    QStack<XYQibu *>::iterator it = historyQibus.begin();
+    while (it != historyQibus.end())
+    {
+        (*it)->switchViews();
+        ++it;
+    }
+}
+
+void XYQipanWidget::moveQizi(XYQiziWidget *qizi, const QPoint &point)
+{
+    putQizi(qizi, point.x(), point.y(), true);
 }
 
 void XYQipanWidget::paintEvent(QPaintEvent *event)

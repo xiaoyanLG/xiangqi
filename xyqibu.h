@@ -14,6 +14,7 @@ public:
     void setTarget(XYQiziWidget *target);
     void setCurPos(const QPoint &pos);
     void setEatenQizi(XYQiziWidget *eatenQizi);
+    void switchViews();
 
 private:
     XYQiziWidget *target;

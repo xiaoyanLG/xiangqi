@@ -49,6 +49,9 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     QPushButton *revokedBtn = new QPushButton(QString::fromStdWString(L"悔棋"));
     revokedBtn->setFixedSize(150, 30);
     connect(revokedBtn, SIGNAL(clicked()), this, SLOT(revoked()));
+    QPushButton *switchBtn = new QPushButton(QString::fromStdWString(L"切换视角"));
+    switchBtn->setFixedSize(150, 30);
+    connect(switchBtn, SIGNAL(clicked()), this, SLOT(switchViews()));
 
     sendMessageEdit = new QLineEdit;
     sendMessageEdit->setFixedWidth(150);
@@ -59,6 +62,7 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     layout->setContentsMargins(25, 20, 0, 30);
 
     layout->addWidget(allOnlinePeoplesWidget, 1);
+    layout->addWidget(switchBtn);
     layout->addWidget(revokedBtn);
     layout->addWidget(layoutBtn);
     layout->addWidget(ZoomOutBtn);
@@ -159,6 +163,11 @@ void XYBattleInfoWidget::layoutQizi()
 void XYBattleInfoWidget::revoked()
 {
     XYQipanWidget::getInstance()->revokeLastQibu();
+}
+
+void XYBattleInfoWidget::switchViews()
+{
+    MainWindow::getInstance()->switchViews();
 }
 
 void XYBattleInfoWidget::sendMessage()

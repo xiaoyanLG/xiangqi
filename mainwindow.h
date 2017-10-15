@@ -20,6 +20,7 @@ public:
 
 public slots:
     void layoutQizi();
+    void switchViews();
     void appendMessage(const QString &from, const QString &message);
     void newParticipant(const QString &nick);
     void participantLeft(const QString &nick);

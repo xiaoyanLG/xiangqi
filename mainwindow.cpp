@@ -77,16 +77,23 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widget->setTempQizi(tempQizi);
 
     // 创建棋手
-    me = new XYQishou(this);
+    me = XYQishou::getInstance();
+    me->setParent(this);
+    me->setQizi(hong_qizis, XYQiziWidget::RED);
+    me->setQizi(hei_qizis, XYQiziWidget::BLACK);
+
     connect(me, SIGNAL(peopleUpline(QString,QHostAddress)),
             ui->widget_2, SLOT(peopleUpline(QString,QHostAddress)));
     connect(me, SIGNAL(peopleOffline(QString,QHostAddress)),
             ui->widget_2, SLOT(peopleOffline(QString,QHostAddress)));
     connect(me, SIGNAL(receiveMessage(QString,QString)),
             ui->widget_2, SLOT(receiveData(QString,QString)));
+    connect(me, SIGNAL(moveQizi(XYQiziWidget*,QPoint)), ui->widget,
+            SLOT(moveQizi(XYQiziWidget*,QPoint)));
 
     connect(ui->widget_2, SIGNAL(sendMessage(QHostAddress,QString)),
             me, SLOT(sendMessage(QHostAddress,QString)));
+
     instance = this;
     resize(1000, 800);
     layoutQizi();
@@ -122,7 +129,7 @@ void MainWindow::testsssss()
 void MainWindow::layoutQizi()
 {
     static bool up = true;
-    ui->widget->clear();
+    ui->widget->clear(true);
     for (int i = 0; i < hong_qizis.size(); ++i)
     {
         hong_qizis.at(i)->setVisible(true);
@@ -135,6 +142,25 @@ void MainWindow::layoutQizi()
         ui->widget->putQiziToDefaultPos(hei_qizis.at(i), !up);
     }
     up = !up;
+}
+
+void MainWindow::switchViews()
+{
+    ui->widget->clear(false);
+    for (int i = 0; i < hong_qizis.size(); ++i)
+    {
+        XYQiziWidget *qizi = hong_qizis.at(i);
+        qizi->switchViews();
+        ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+    }
+
+    for (int i = 0; i < hei_qizis.size(); ++i)
+    {
+        XYQiziWidget *qizi = hei_qizis.at(i);
+        qizi->switchViews();
+        ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+    }
+    ui->widget->switchViews();
 }
 
 void MainWindow::appendMessage(const QString &from, const QString &message)

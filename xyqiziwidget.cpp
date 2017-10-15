@@ -17,6 +17,17 @@ XYQiziWidget::~XYQiziWidget()
 
 }
 
+void XYQiziWidget::switchViews()
+{
+    int x = 9 - curPos.x();
+    int y = 8 - curPos.y();
+    int defX = 9 - defaultPos.x();
+    int defY = 8 - defaultPos.y();
+
+    curPos = QPoint(x, y);
+    defaultPos = QPoint(defX, defY);
+}
+
 QPoint XYQiziWidget::getQiziDefaultPos(bool up)
 {
     int row = 0;
@@ -276,6 +287,22 @@ bool XYQiziWidget::isMovable(int row, int column)
     return yes;
 }
 
+XYQiziWidget::SIDETYPE XYQiziWidget::getSideType()
+{
+    if (type >= HONG_ZU
+            && type <= HONG_JIANG)
+    {
+        return RED;
+    }
+    else if (type >= HEI_ZU
+             && type <= HEI_JIANG)
+    {
+        return BLACK;
+    }
+
+    return UNKNOWN;
+}
+
 void XYQiziWidget::setType(XYQiziWidget::TYPE type, int times)
 {
     this->type = type;
@@ -407,6 +434,20 @@ void XYQiziWidget::setPixmap(const QPixmap &value)
 QPoint XYQiziWidget::getCurPos() const
 {
     return curPos;
+}
+
+QPoint XYQiziWidget::getSwitchViewsPos(const QPoint &point)
+{
+    int x = 9 - point.x();
+    int y = 8 - point.y();
+    return QPoint(x, y);
+}
+
+QPoint XYQiziWidget::getSwitchViewsPos()
+{
+    int x = 9 - curPos.x();
+    int y = 8 - curPos.y();
+    return QPoint(x, y);
 }
 
 void XYQiziWidget::setCurPos(const QPoint &value)

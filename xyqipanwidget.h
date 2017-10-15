@@ -13,7 +13,7 @@ public:
     static XYQipanWidget *getInstance();
     explicit XYQipanWidget(QWidget *parent = 0);
     ~XYQipanWidget();
-    void clear();
+    void clear(bool clearHistory);
     void putQiziToDefaultPos(XYQiziWidget *qizi, bool up);
     void putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory);
     void moveToNearestPos(XYQiziWidget *qizi);
@@ -22,9 +22,13 @@ public:
     void raiseTempQizi();
     void showTempQizi(XYQiziWidget *qizi);
     void revokeLastQibu();
+    void switchViews();
 
 signals:
     void sizeChanged(const QSize &size);
+
+public slots:
+    void moveQizi(XYQiziWidget *qizi, const QPoint &point);
 
 protected:
     void paintEvent(QPaintEvent *event);

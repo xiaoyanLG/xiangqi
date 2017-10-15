@@ -7,16 +7,23 @@ class XYQiziWidget : public QWidget
 {
     Q_OBJECT
 public:
+    enum SIDETYPE{RED, BLACK, UNKNOWN};
     enum TYPE{HONG_ZU, HONG_PAO, HONG_CHE, HONG_MA, HONG_XIANG, HONG_SI, HONG_JIANG,
               HEI_ZU, HEI_PAO, HEI_CHE, HEI_MA, HEI_XIANG, HEI_SI, HEI_JIANG, TEMP};
     explicit XYQiziWidget(TYPE type, int times, QWidget *parent = 0);
     ~XYQiziWidget();
+
+    // 切换视角
+    void switchViews();
 
     // 获取棋子默认的位置
     QPoint getQiziDefaultPos(bool up);
 
     // 判断位置棋子是否可以走
     bool isMovable(int row, int column);
+
+    // 获取棋子是哪一方的
+    SIDETYPE getSideType();
 
     void setType(TYPE type, int times);
     TYPE getType() const;
@@ -25,6 +32,8 @@ public:
     void setBeEaten(bool beEaten);
 
     QPoint getCurPos() const;
+    QPoint getSwitchViewsPos(const QPoint &point);
+    QPoint getSwitchViewsPos();
     void setCurPos(const QPoint &value);
 
     QPixmap getPixmap() const;
@@ -53,6 +62,7 @@ private:
     QPoint  defaultPos;    // 记录初始位置
 
     friend class XYQipanWidget;
+    friend class XYQishou;
 
 };
 

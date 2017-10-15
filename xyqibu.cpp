@@ -27,3 +27,10 @@ void XYQibu::setEatenQizi(XYQiziWidget *eatenQizi)
     this->eatenQizi = eatenQizi;
 }
 
+void XYQibu::switchViews()
+{
+    int x = 9 - curPos.x();
+    int y = 8 - curPos.y();
+    curPos = QPoint(x, y);
+}
+
