@@ -2,6 +2,7 @@
 #define XYQISHOU_H
 
 #include <QObject>
+#include <QIcon>
 #include "xyudpbroadcast.h"
 #include "xytcpsocket.h"
 #include "xyqiziwidget.h"
@@ -16,19 +17,28 @@ public:
 
     void setQizi(const QList<XYQiziWidget *> &qizis, XYQiziWidget::SIDETYPE type);
     XYQiziWidget::SIDETYPE getSideType() const;
+    QIcon getSideIcon();
     void setSideType(XYQiziWidget::SIDETYPE type);
+    void switchSideType();
 
 signals:
     void peopleUpline(const QString &name, const QHostAddress &address);
     void peopleOffline(const QString &name, const QHostAddress &address);
     void receiveMessage(const QString &from, const QString &msg);
-    void moveQizi(XYQiziWidget *qizi, const QPoint &point);
+    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked);
 
 
 public slots:
     void receiveData(const QString &from, const QByteArray &data, int type);
     void sendMessage(const QHostAddress &address, const QString &msg);
-    void sendQizi(const QHostAddress &address, XYQiziWidget *qizi, const QPoint &point);
+    void sendQiziWithUDP(const QHostAddress &address,
+                         XYQiziWidget *qizi,
+                         const QPoint &point,
+                         bool revoked);
+    void sendQiziWithTCP(const QHostAddress &address,
+                         XYQiziWidget *qizi,
+                         const QPoint &point,
+                         bool revoked);
 
 protected:
     void timerEvent(QTimerEvent *event);

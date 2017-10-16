@@ -12,8 +12,10 @@ class XYBattleInfoWidget : public QWidget
 {
     Q_OBJECT
 public:
+    static XYBattleInfoWidget *getInstance();
     explicit XYBattleInfoWidget(QWidget *parent = 0);
     ~XYBattleInfoWidget();
+    QHostAddress getSendHostAddress();
 
 signals:
     void sendMessage(const QHostAddress &address, const QString &msg);
@@ -33,9 +35,11 @@ private slots:
     void layoutQizi();
     void revoked();
     void switchViews();
+    void switchColor();
     void sendMessage();
 
 private:
+    static XYBattleInfoWidget *instance;
     QMap<int, QHostAddress> allPeoplesMap;
     QPixmap qipanPixmap;
     QListWidget *allOnlinePeoplesWidget;

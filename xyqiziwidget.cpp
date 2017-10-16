@@ -6,8 +6,10 @@
 #include <QDebug>
 
 XYQiziWidget::XYQiziWidget(TYPE type, int times, QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent), beEaten(false), curPos(QPoint(-1, -1))
 {
+    mopMoveAnimation = new QPropertyAnimation(this, "pos");
+    mopMoveAnimation->setDuration(500);
     setType(type, times);
     setVisible(false);
 }
@@ -17,15 +19,26 @@ XYQiziWidget::~XYQiziWidget()
 
 }
 
+void XYQiziWidget::moveWithAnimation(const QPoint &target)
+{
+    mopMoveAnimation->setStartValue(pos());
+    mopMoveAnimation->setEndValue(target);
+    mopMoveAnimation->start();
+}
+
 void XYQiziWidget::switchViews()
 {
-    int x = 9 - curPos.x();
-    int y = 8 - curPos.y();
-    int defX = 9 - defaultPos.x();
-    int defY = 8 - defaultPos.y();
+    int x = 9 - defaultPos.x();
+    int y = 8 - defaultPos.y();
 
-    curPos = QPoint(x, y);
-    defaultPos = QPoint(defX, defY);
+    defaultPos = QPoint(x, y);
+
+    if (!beEaten)
+    {
+        x = 9 - curPos.x();
+        y = 8 - curPos.y();
+        curPos = QPoint(x, y);
+    }
 }
 
 QPoint XYQiziWidget::getQiziDefaultPos(bool up)
@@ -75,6 +88,12 @@ QPoint XYQiziWidget::getQiziDefaultPos(bool up)
         break;
     default:
         break;
+    }
+
+    // 是否需要颠倒顺序
+    if (up)
+    {
+        column = 8 - column;
     }
     defaultPos = QPoint(row, column);
     curPos = QPoint(-1, -1);
@@ -324,6 +343,7 @@ void XYQiziWidget::paintEvent(QPaintEvent *event)
         painter.setOpacity(0.55);
     }
     painter.drawPixmap(rect(), getPixMapByType(type));
+//    painter.drawText(rect(), QString::number(times));
 }
 
 void XYQiziWidget::mousePressEvent(QMouseEvent *event)
@@ -443,13 +463,6 @@ QPoint XYQiziWidget::getSwitchViewsPos(const QPoint &point)
     return QPoint(x, y);
 }
 
-QPoint XYQiziWidget::getSwitchViewsPos()
-{
-    int x = 9 - curPos.x();
-    int y = 8 - curPos.y();
-    return QPoint(x, y);
-}
-
 void XYQiziWidget::setCurPos(const QPoint &value)
 {
     curPos = value;
@@ -470,6 +483,7 @@ void XYQiziWidget::setBeEaten(bool beEaten)
     {
         setVisible(true);
     }
+
     this->beEaten = beEaten;
 }
 

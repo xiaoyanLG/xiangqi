@@ -15,20 +15,22 @@ public:
     ~XYQipanWidget();
     void clear(bool clearHistory);
     void putQiziToDefaultPos(XYQiziWidget *qizi, bool up);
-    void putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory);
+    void putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory, bool animation = false);
+    void revokeQizi(XYQiziWidget *qizi, int row, int column, bool beEaten);
     void moveToNearestPos(XYQiziWidget *qizi);
     XYQiziWidget *getPositionQizi(int row, int column);
     void setTempQizi(XYQiziWidget *qizi);
     void raiseTempQizi();
     void showTempQizi(XYQiziWidget *qizi);
-    void revokeLastQibu();
+    void revokeLastQibu(bool socket = true);
     void switchViews();
 
 signals:
     void sizeChanged(const QSize &size);
+    void showMessages(const QString &msg);
 
 public slots:
-    void moveQizi(XYQiziWidget *qizi, const QPoint &point);
+    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -39,12 +41,14 @@ private:
     QPainterPath getPosPath(const QPointF &point, qreal w, int type); // type: 1, 2, 1|2
 
 private:
-    static XYQipanWidget *instance;
-    XYQiziWidget *tempQizi;
-    QPixmap qipanPixmap;
-    QPoint  allPos[10][9];
-    XYQiziWidget *qiziInqipan[10][9];
-    QStack<XYQibu *> historyQibus;
+    static XYQipanWidget *instance;          // 棋盘单例
+    XYQiziWidget *tempQizi;                  // 临时棋子，阴影显示当前可移动的棋步
+    QPixmap qipanPixmap;                     // 棋盘背景图片
+    QPoint  allPos[10][9];                   // 记录棋盘上的可下棋的点
+    XYQiziWidget *qiziInqipan[10][9];        // 记录棋盘当前棋子所在
+    QStack<XYQibu *> historyQibus;           // 记录历史的棋步
+
+    XYQiziWidget::SIDETYPE lastSideType;      // 记录上次下棋的棋方
 
 };
 

@@ -20,6 +20,7 @@ private:
     XYQiziWidget *target;
     QPoint        curPos;
     XYQiziWidget *eatenQizi;
+    QPoint        eatenPos;
 
     friend class XYQipanWidget;
 };

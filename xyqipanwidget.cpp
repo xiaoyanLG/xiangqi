@@ -1,8 +1,10 @@
 ﻿#include "xyqipanwidget.h"
 #include "xyqishou.h"
+#include "xybattleinfowidget.h"
 #include <QPainter>
 #include <QResizeEvent>
 #include <qmath.h>
+#include <QMessageBox>
 #include <QDebug>
 
 static qreal lengthToPoint(const QPoint &p1, const QPoint &p2)
@@ -19,7 +21,7 @@ XYQipanWidget *XYQipanWidget::getInstance()
 }
 
 XYQipanWidget::XYQipanWidget(QWidget *parent)
-    : QWidget(parent), tempQizi(NULL)
+    : QWidget(parent), tempQizi(NULL), lastSideType(XYQiziWidget::UNKNOWN)
 {
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
     qipanPixmap.load(":/xiangqi/qipan.png");
@@ -34,6 +36,7 @@ XYQipanWidget::~XYQipanWidget()
 
 void XYQipanWidget::clear(bool clearHistory)
 {
+    lastSideType = XYQiziWidget::UNKNOWN;
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
     if (clearHistory)
     {
@@ -68,12 +71,20 @@ void XYQipanWidget::putQiziToDefaultPos(XYQiziWidget *qizi, bool up)
     qizi->curPos = QPoint(row, column);
 }
 
-void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory)
+void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory, bool animation)
 {
     XYQiziWidget *eaten = NULL;
     QPoint lastPos = qizi->curPos;
-    qizi->move(allPos[row][column] -
-            QPoint(qizi->width() / 2, qizi->height() / 2));
+    if (animation)
+    {
+        qizi->moveWithAnimation(allPos[row][column] -
+                                QPoint(qizi->width() / 2, qizi->height() / 2));
+    }
+    else
+    {
+        qizi->move(allPos[row][column] -
+                QPoint(qizi->width() / 2, qizi->height() / 2));
+    }
 
     if (qizi->type != XYQiziWidget::TEMP)
     {
@@ -97,7 +108,46 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHis
     {
         XYQibu *curQibu = new XYQibu(qizi, lastPos, eaten);
         historyQibus.push(curQibu);
+
+        // 记录当前下子的棋方
+        lastSideType = qizi->getSideType();
     }
+}
+
+void XYQipanWidget::revokeQizi(XYQiziWidget *qizi, int row, int column, bool beEaten)
+{
+    if (!beEaten)
+    {
+        // 记录当前下子的棋方
+        if (qizi->getSideType() == XYQiziWidget::RED)
+        {
+            lastSideType = XYQiziWidget::BLACK;
+        }
+        else
+        {
+            lastSideType = XYQiziWidget::RED;
+        }
+
+        qizi->moveWithAnimation(allPos[row][column] -
+                                QPoint(qizi->width() / 2, qizi->height() / 2));
+    }
+    else
+    {
+        qizi->move(allPos[row][column] -
+                QPoint(qizi->width() / 2, qizi->height() / 2));
+    }
+
+    if (qizi->type != XYQiziWidget::TEMP)
+    {
+        if (qizi->curPos.x() >= 0 && qizi->curPos.x() <= 9
+                && qizi->curPos.y() >= 0 && qizi->curPos.y() <= 8)
+        {
+            qiziInqipan[qizi->curPos.x()][qizi->curPos.y()] = NULL;
+        }
+        qiziInqipan[row][column] = qizi;
+    }
+
+    qizi->curPos = QPoint(row, column);
 }
 
 void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
@@ -109,16 +159,29 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
     {
         tempQizi->setVisible(false);
     }
-    if (qizi->isMovable(row, column)
-            && XYQishou::getInstance()->getSideType() == qizi->getSideType())
+
+    if (lastSideType == qizi->getSideType())
     {
-        XYQishou::getInstance()->moveQizi(qizi, QPoint(row, column));
+        emit showMessages(QString::fromStdWString(L"该对方下棋！"));
+
+    }
+    else if (XYQishou::getInstance()->getSideType() != qizi->getSideType())
+    {
+        emit showMessages(QString::fromStdWString(L"不能操作对方的棋子！"));
+    }
+    else if (qizi->isMovable(row, column))
+    {
+        XYQishou::getInstance()->sendQiziWithUDP(
+                    XYBattleInfoWidget::getInstance()->getSendHostAddress(),
+                    qizi, QPoint(row, column), false);
         putQizi(qizi, row, column, true);
+        return;
     }
-    else
+    else if (qizi->curPos != QPoint(row, column))
     {
-        putQizi(qizi, qizi->curPos.x(), qizi->curPos.y(), false);
+        emit showMessages(QString::fromStdWString(L"该棋子不能走这里！"));
     }
+    putQizi(qizi, qizi->curPos.x(), qizi->curPos.y(), false);
 }
 
 XYQiziWidget *XYQipanWidget::getPositionQizi(int row, int column)
@@ -161,20 +224,25 @@ void XYQipanWidget::showTempQizi(XYQiziWidget *qizi)
     }
 }
 
-void XYQipanWidget::revokeLastQibu()
+void XYQipanWidget::revokeLastQibu(bool socket)
 {
-
     if (!historyQibus.isEmpty())
     {
         XYQibu *last = historyQibus.pop();
         if (last->target != NULL)
         {
-            putQizi(last->target, last->curPos.x(), last->curPos.y(), false);
+            if (socket)
+            {
+                XYQishou::getInstance()->sendQiziWithUDP(
+                            XYBattleInfoWidget::getInstance()->getSendHostAddress(),
+                            last->target, last->curPos, true);
+            }
+            revokeQizi(last->target, last->curPos.x(), last->curPos.y(), false);
         }
         if (last->eatenQizi != NULL)
         {
             last->eatenQizi->setBeEaten(false);
-            putQizi(last->eatenQizi, last->eatenQizi->curPos.x(), last->eatenQizi->curPos.y(), false);
+            revokeQizi(last->eatenQizi, last->eatenPos.x(), last->eatenPos.y(), true);
         }
         delete last;
     }
@@ -190,9 +258,16 @@ void XYQipanWidget::switchViews()
     }
 }
 
-void XYQipanWidget::moveQizi(XYQiziWidget *qizi, const QPoint &point)
+void XYQipanWidget::moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked)
 {
-    putQizi(qizi, point.x(), point.y(), true);
+    if (revoked)
+    {
+        revokeLastQibu(false);
+    }
+    else
+    {
+        putQizi(qizi, point.x(), point.y(), true, true);
+    }
 }
 
 void XYQipanWidget::paintEvent(QPaintEvent *event)

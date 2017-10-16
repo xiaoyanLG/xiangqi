@@ -3,6 +3,8 @@
 #include "xyqiziwidget.h"
 #include <QMouseEvent>
 #include <QApplication>
+#include <QLabel>
+#include <QTimer>
 #include <QDebug>
 
 MainWindow *MainWindow::instance;
@@ -88,11 +90,13 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->widget_2, SLOT(peopleOffline(QString,QHostAddress)));
     connect(me, SIGNAL(receiveMessage(QString,QString)),
             ui->widget_2, SLOT(receiveData(QString,QString)));
-    connect(me, SIGNAL(moveQizi(XYQiziWidget*,QPoint)), ui->widget,
-            SLOT(moveQizi(XYQiziWidget*,QPoint)));
+    connect(me, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool)), ui->widget,
+            SLOT(moveQizi(XYQiziWidget*,QPoint,bool)));
 
     connect(ui->widget_2, SIGNAL(sendMessage(QHostAddress,QString)),
             me, SLOT(sendMessage(QHostAddress,QString)));
+
+    connect(ui->widget, SIGNAL(showMessages(QString)), this, SLOT(showMessage(QString)));
 
     instance = this;
     resize(1000, 800);
@@ -102,6 +106,31 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::showMessage(const QString &msg)
+{
+    static QLabel *msgLabel = NULL;
+    static QTimer *timer = NULL;
+    if (msgLabel == NULL)
+    {
+        msgLabel = new QLabel(this);
+        msgLabel->setAlignment(Qt::AlignCenter);
+        timer = new QTimer;
+        connect(timer, SIGNAL(timeout()), msgLabel, SLOT(close()));
+        QFont font = msgLabel->font();
+        font.setFamily(QString::fromStdWString(L"华文行楷"));
+        font.setPointSize(25);
+        msgLabel->setFont(font);
+        msgLabel->setStyleSheet("background-color: rgb(0, 0, 0, 0); "
+                                "color: rgb(248, 237, 56)");
+    }
+    msgLabel->raise();
+    msgLabel->setText(msg);
+    msgLabel->resize(width() - 200, 50);
+    timer->start(3000);
+    msgLabel->show();
+    msgLabel->move(0, (height() - msgLabel->height()) / 2);
 }
 
 void MainWindow::testsssss()
@@ -151,14 +180,20 @@ void MainWindow::switchViews()
     {
         XYQiziWidget *qizi = hong_qizis.at(i);
         qizi->switchViews();
-        ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+        if (!qizi->getBeEaten())
+        {
+            ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+        }
     }
 
     for (int i = 0; i < hei_qizis.size(); ++i)
     {
         XYQiziWidget *qizi = hei_qizis.at(i);
         qizi->switchViews();
-        ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+        if (!qizi->getBeEaten())
+        {
+            ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+        }
     }
     ui->widget->switchViews();
 }

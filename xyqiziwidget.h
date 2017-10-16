@@ -2,6 +2,7 @@
 #define XYQIZIWIDGET_H
 
 #include <QWidget>
+#include <QPropertyAnimation>
 
 class XYQiziWidget : public QWidget
 {
@@ -12,6 +13,7 @@ public:
               HEI_ZU, HEI_PAO, HEI_CHE, HEI_MA, HEI_XIANG, HEI_SI, HEI_JIANG, TEMP};
     explicit XYQiziWidget(TYPE type, int times, QWidget *parent = 0);
     ~XYQiziWidget();
+    void moveWithAnimation(const QPoint &target);
 
     // 切换视角
     void switchViews();
@@ -33,7 +35,6 @@ public:
 
     QPoint getCurPos() const;
     QPoint getSwitchViewsPos(const QPoint &point);
-    QPoint getSwitchViewsPos();
     void setCurPos(const QPoint &value);
 
     QPixmap getPixmap() const;
@@ -50,6 +51,7 @@ protected:
     QPixmap getPixMapByType(TYPE type, bool force = false);
 
 protected:
+    QPropertyAnimation *mopMoveAnimation;
     bool          mbLeftMousePressed;
     QPoint        moLastPos;
 

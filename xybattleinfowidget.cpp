@@ -9,9 +9,17 @@
 #include <QTextEdit>
 #include <QLineEdit>
 
+XYBattleInfoWidget *XYBattleInfoWidget::instance = NULL;
+XYBattleInfoWidget *XYBattleInfoWidget::getInstance()
+{
+    return instance;
+}
+
 XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     : QWidget(parent)
 {
+    instance = this;
+
     QString qss0="QPushButton {\
                     background-color: #473C8B;\
                     border-style: outset;\
@@ -52,6 +60,10 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     QPushButton *switchBtn = new QPushButton(QString::fromStdWString(L"切换视角"));
     switchBtn->setFixedSize(150, 30);
     connect(switchBtn, SIGNAL(clicked()), this, SLOT(switchViews()));
+    QPushButton *switchColorBtn = new QPushButton(QString::fromStdWString(L"切换棋方"));
+    switchColorBtn->setFixedSize(150, 30);
+    switchColorBtn->setIcon(XYQishou::getInstance()->getSideIcon());
+    connect(switchColorBtn, SIGNAL(clicked()), this, SLOT(switchColor()));
 
     sendMessageEdit = new QLineEdit;
     sendMessageEdit->setFixedWidth(150);
@@ -62,6 +74,7 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     layout->setContentsMargins(25, 20, 0, 30);
 
     layout->addWidget(allOnlinePeoplesWidget, 1);
+    layout->addWidget(switchColorBtn);
     layout->addWidget(switchBtn);
     layout->addWidget(revokedBtn);
     layout->addWidget(layoutBtn);
@@ -79,6 +92,17 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
 XYBattleInfoWidget::~XYBattleInfoWidget()
 {
 
+}
+
+QHostAddress XYBattleInfoWidget::getSendHostAddress()
+{
+    QHostAddress address = allPeoplesMap.value(allOnlinePeoplesWidget->currentRow());
+    if (address.isNull())
+    {
+        address = QHostAddress(QHostAddress::Broadcast);
+    }
+
+    return address;
 }
 
 void XYBattleInfoWidget::paintEvent(QPaintEvent *event)
@@ -122,6 +146,7 @@ void XYBattleInfoWidget::peopleOffline(const QString &name, const QHostAddress &
         if (address_in == address)
         {
             allOnlinePeoplesWidget->takeItem(it.key());
+            break;
         }
         ++it;
     }
@@ -170,16 +195,20 @@ void XYBattleInfoWidget::switchViews()
     MainWindow::getInstance()->switchViews();
 }
 
+void XYBattleInfoWidget::switchColor()
+{
+    QPushButton *btn = (QPushButton *)sender();
+    XYQishou::getInstance()->switchSideType();
+    btn->setIcon(XYQishou::getInstance()->getSideIcon());
+}
+
 void XYBattleInfoWidget::sendMessage()
 {
     QString data = sendMessageEdit->text();
-    QHostAddress address = allPeoplesMap.value(allOnlinePeoplesWidget->currentRow());
-    if (address.isNull())
-    {
-        address = QHostAddress(QHostAddress::Broadcast);
-    }
+    sendMessageEdit->clear();
+    QHostAddress address = getSendHostAddress();
 
     messageBox->setTextColor("green");
-    messageBox->append(QStringLiteral("你说") + ": " + data);
+    messageBox->append(QString::fromStdWString(L"你说: ") + data);
     emit sendMessage(address, data);
 }
