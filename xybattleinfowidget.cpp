@@ -87,6 +87,9 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     qipanPixmap.load(":/xiangqi/qipan.png");
 
     allOnlinePeoplesWidget->addItem(XYUdpbroadcast::getUserName());
+
+    connect(allOnlinePeoplesWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+            this, SLOT(connectPeople(QListWidgetItem*)));
 }
 
 XYBattleInfoWidget::~XYBattleInfoWidget()
@@ -146,6 +149,7 @@ void XYBattleInfoWidget::peopleOffline(const QString &name, const QHostAddress &
         if (address_in == address)
         {
             allOnlinePeoplesWidget->takeItem(it.key());
+            allPeoplesMap.erase(it);
             break;
         }
         ++it;
@@ -211,4 +215,10 @@ void XYBattleInfoWidget::sendMessage()
     messageBox->setTextColor("green");
     messageBox->append(QString::fromStdWString(L"你说: ") + data);
     emit sendMessage(address, data);
+}
+
+void XYBattleInfoWidget::connectPeople(QListWidgetItem *item)
+{
+    QHostAddress address = allPeoplesMap.value(allOnlinePeoplesWidget->row(item));
+    XYQishou::getInstance()->connectPeople(address);
 }

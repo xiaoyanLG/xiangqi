@@ -25,7 +25,7 @@ SOURCES += main.cpp\
     socket/server.cpp \
     socket/xyudpbroadcast.cpp \
     xyqishou.cpp \
-    socket/xytcpsocket.cpp
+    socket/xytcpserver.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
@@ -38,7 +38,7 @@ HEADERS  += mainwindow.h \
     socket/server.h \
     socket/xyudpbroadcast.h \
     xyqishou.h \
-    socket/xytcpsocket.h
+    socket/xytcpserver.h
 
 FORMS    += mainwindow.ui
 

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QIcon>
 #include "xyudpbroadcast.h"
-#include "xytcpsocket.h"
+#include "xytcpserver.h"
 #include "xyqiziwidget.h"
 
 class XYQishou : public QObject
@@ -29,6 +29,7 @@ signals:
 
 
 public slots:
+    void connectPeople(const QHostAddress &address);
     void receiveData(const QString &from, const QByteArray &data, int type);
     void sendMessage(const QHostAddress &address, const QString &msg);
     void sendQiziWithUDP(const QHostAddress &address,
@@ -55,7 +56,7 @@ private:
     QList<XYQiziWidget *>  hong_qizis;
     QList<XYQiziWidget *>  hei_qizis;
     XYUdpbroadcast        *UDPSocket;
-    XYTcpSocket           *TCPSocket;
+    XYTcpServer           *TCPServer;
     XYQiziWidget::SIDETYPE type;
 
 };

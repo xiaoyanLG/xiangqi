@@ -37,6 +37,7 @@ private slots:
     void switchViews();
     void switchColor();
     void sendMessage();
+    void connectPeople(QListWidgetItem *item);
 
 private:
     static XYBattleInfoWidget *instance;

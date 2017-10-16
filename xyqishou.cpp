@@ -5,7 +5,7 @@ XYQishou::XYQishou(QObject *parent)
     : QObject(parent), type(XYQiziWidget::RED)
 {
     UDPSocket = new XYUdpbroadcast(this);
-    TCPSocket = new XYTcpSocket(this);
+    TCPServer = new XYTcpServer(this);
 
     connect(UDPSocket, SIGNAL(peopleUpline(QString,QHostAddress)),
             this, SIGNAL(peopleUpline(QString,QHostAddress)));
@@ -128,6 +128,11 @@ void XYQishou::switchSideType()
     {
         this->type = XYQiziWidget::RED;
     }
+}
+
+void XYQishou::connectPeople(const QHostAddress &address)
+{
+    TCPServer->connectToHost(address);
 }
 
 void XYQishou::receiveData(const QString &from, const QByteArray &data, int type)
