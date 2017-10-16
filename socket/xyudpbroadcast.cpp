@@ -8,7 +8,11 @@ XYUdpbroadcast::XYUdpbroadcast(QObject *parent)
     : QUdpSocket(parent), port(45954)
 {
     // 绑定端口
+#if (QT_VERSION >= 0x050000)
     bind(port, QAbstractSocket::ShareAddress);
+#else
+    bind(port, QUdpSocket::ShareAddress);
+#endif
     connect(this, SIGNAL(readyRead()), this, SLOT(receiveBroadcast()));
 
     // 获取用户名
