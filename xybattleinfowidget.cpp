@@ -1,6 +1,7 @@
 ﻿#include "xybattleinfowidget.h"
 #include "mainwindow.h"
 #include "xyqipanwidget.h"
+#include "xyinput.h"
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -66,6 +67,7 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     connect(switchColorBtn, SIGNAL(clicked()), this, SLOT(switchColor()));
 
     sendMessageEdit = new QLineEdit;
+    sendMessageEdit->installEventFilter(XYInput::getInstance());
     sendMessageEdit->setFixedWidth(150);
     connect(sendMessageEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     messageBox = new QTextEdit;

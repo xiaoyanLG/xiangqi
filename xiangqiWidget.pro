@@ -4,14 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = xiangqiWidget
 TEMPLATE = app
 
-INCLUDEPATH += socket
+INCLUDEPATH += socket chineseInput
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -25,7 +25,16 @@ SOURCES += main.cpp\
     socket/server.cpp \
     socket/xyudpbroadcast.cpp \
     xyqishou.cpp \
-    socket/xytcpserver.cpp
+    socket/xytcpserver.cpp \
+    chineseInput/xybordershadowwidget.cpp \
+    chineseInput/xydatabaseoperation.cpp \
+    chineseInput/xyinput.cpp \
+    chineseInput/xymenu.cpp \
+    chineseInput/xymenustyle.cpp \
+    chineseInput/xytooltips.cpp \
+    chineseInput/xytranslateitem.cpp \
+    chineseInput/xytranslatemodel.cpp \
+    chineseInput/xytranslateview.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
@@ -38,7 +47,16 @@ HEADERS  += mainwindow.h \
     socket/server.h \
     socket/xyudpbroadcast.h \
     xyqishou.h \
-    socket/xytcpserver.h
+    socket/xytcpserver.h \
+    chineseInput/xybordershadowwidget.h \
+    chineseInput/xydatabaseoperation.h \
+    chineseInput/xyinput.h \
+    chineseInput/xymenu.h \
+    chineseInput/xymenustyle.h \
+    chineseInput/xytooltips.h \
+    chineseInput/xytranslateitem.h \
+    chineseInput/xytranslatemodel.h \
+    chineseInput/xytranslateview.h
 
 FORMS    += mainwindow.ui
 
