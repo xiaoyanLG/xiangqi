@@ -198,10 +198,6 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
                 break;
             }
 
-            if (!TCPServer->isConnected())
-            {
-                break;
-            }
             QByteArray sideType;
             QDataStream in(&sideType, QIODevice::WriteOnly);
             if (QMessageBox::question(MainWindow::getInstance(), from, QString::fromStdWString(L"请选择棋方，红（yes）还是黑（no）？"),
