@@ -138,7 +138,20 @@ void XYQishou::switchSideType()
 
 void XYQishou::connectPeople(const QHostAddress &address)
 {
-    TCPServer->connectToHost(address);
+    if (TCPServer->isConnected())
+    {
+        if (QMessageBox::question(MainWindow::getInstance(), QString::fromStdWString(L"提示"),
+                              QString::fromStdWString(L"你正在和 %1 对战，是否退出？").arg(opponentQishou))
+                == QMessageBox::Yes)
+        {
+            opponentQishou.clear();
+            TCPServer->abort();
+        }
+    }
+    else
+    {
+        TCPServer->connectToHost(address);
+    }
 }
 
 void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int type)
@@ -176,6 +189,7 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
             {
                 TCPServer->writeUserData(QByteArray(), ACCEPT);
                 opponentQishou = from;
+                MainWindow::getInstance()->layoutQizi(true);
             }
             else
             {
@@ -184,6 +198,10 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
                 break;
             }
 
+            if (!TCPServer->isConnected())
+            {
+                break;
+            }
             QByteArray sideType;
             QDataStream in(&sideType, QIODevice::WriteOnly);
             if (QMessageBox::question(MainWindow::getInstance(), from, QString::fromStdWString(L"请选择棋方，红（yes）还是黑（no）？"),
@@ -209,6 +227,7 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
         if (data.isEmpty())
         {
             opponentQishou = from;
+            MainWindow::getInstance()->layoutQizi(true);
             emit showMessages(QString("%1: %2").arg(from).arg(QString::fromStdWString(L"接受对战，请等待对方选择棋方！")), 0);
         }
         break;
@@ -258,7 +277,7 @@ void XYQishou::sendMessage(const QHostAddress &address, const QString &msg)
 
 void XYQishou::sendQizi(const QHostAddress &address, XYQiziWidget *qizi, const QPoint &point, bool revoked)
 {
-    if (TCPServer)
+    if (TCPServer->isConnected())
     {
         sendQiziWithTCP(address, qizi, point, revoked);
     }

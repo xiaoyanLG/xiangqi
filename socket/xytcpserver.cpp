@@ -19,7 +19,7 @@ bool XYTcpServer::isSender()
 
 bool XYTcpServer::isConnected()
 {
-    return client->state() == QTcpSocket::ConnectingState;
+    return client->state() == QTcpSocket::ConnectedState;
 }
 
 void XYTcpServer::abort()

@@ -165,10 +165,14 @@ void MainWindow::testsssss()
 //    }
 }
 
-void MainWindow::layoutQizi()
+void MainWindow::layoutQizi(bool keep)
 {
     static bool up = true;
     ui->widget->clear(true);
+    if (keep)
+    {
+        up = !up;
+    }
     for (int i = 0; i < hong_qizis.size(); ++i)
     {
         hong_qizis.at(i)->setVisible(true);
