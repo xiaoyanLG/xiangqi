@@ -10,13 +10,16 @@ class XYTcpServer : public QTcpServer
     Q_OBJECT
 public:
     explicit XYTcpServer(QObject *parent = 0);
+    bool isSender();
+    bool isConnected();
+    void abort();
 
 signals:
-    void receiveUserData(const QByteArray &data, int type);
+    void receiveUserData(const QString &from, const QByteArray &data, int type);
+    void stateChanged(QAbstractSocket::SocketState state);
 
 public slots:
     void connectToHost(const QHostAddress &address);
-    void stateChanged(QAbstractSocket::SocketState state);
     void writeUserData(const QByteArray &data, int type);
 
 protected slots:
@@ -27,7 +30,9 @@ protected:
 
 private:
     QTcpSocket *client;
+    QString     userName;
     int         port;
+    bool        sender;
 };
 
 #endif // XYTCPSOCKET_H

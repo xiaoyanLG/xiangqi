@@ -86,6 +86,8 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
 
     qipanPixmap.load(":/xiangqi/qipan.png");
 
+    funcBtns.insert(0, switchColorBtn);
+
     allOnlinePeoplesWidget->addItem(XYUdpbroadcast::getUserName());
 
     connect(allOnlinePeoplesWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
@@ -160,6 +162,12 @@ void XYBattleInfoWidget::receiveData(const QString &from, const QString &data)
 {
     messageBox->setTextColor("blue");
     messageBox->append(from + ": " + data);
+}
+
+void XYBattleInfoWidget::qishouSideChanged()
+{
+    QPushButton *btn = funcBtns.value(0);
+    btn->setIcon(XYQishou::getInstance()->getSideIcon());
 }
 
 void XYBattleInfoWidget::exit()

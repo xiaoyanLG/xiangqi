@@ -171,7 +171,7 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
     }
     else if (qizi->isMovable(row, column))
     {
-        XYQishou::getInstance()->sendQiziWithUDP(
+        XYQishou::getInstance()->sendQizi(
                     XYBattleInfoWidget::getInstance()->getSendHostAddress(),
                     qizi, QPoint(row, column), false);
         putQizi(qizi, row, column, true);
@@ -233,7 +233,7 @@ void XYQipanWidget::revokeLastQibu(bool socket)
         {
             if (socket)
             {
-                XYQishou::getInstance()->sendQiziWithUDP(
+                XYQishou::getInstance()->sendQizi(
                             XYBattleInfoWidget::getInstance()->getSendHostAddress(),
                             last->target, last->curPos, true);
             }

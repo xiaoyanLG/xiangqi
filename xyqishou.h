@@ -11,7 +11,7 @@ class XYQishou : public QObject
 {
     Q_OBJECT
 public:
-    enum MSGTYPE{MSG, START, SIDE, POINT, END};
+    enum MSGTYPE{MSG, REQUEST, ACCEPT, REJECT, SIDE, POINT};
     static XYQishou *getInstance();
     ~XYQishou();
 
@@ -22,6 +22,8 @@ public:
     void switchSideType();
 
 signals:
+    void showMessages(const QString &msg, int times);
+    void sideChanged();
     void peopleUpline(const QString &name, const QHostAddress &address);
     void peopleOffline(const QString &name, const QHostAddress &address);
     void receiveMessage(const QString &from, const QString &msg);
@@ -30,8 +32,12 @@ signals:
 
 public slots:
     void connectPeople(const QHostAddress &address);
-    void receiveData(const QString &from, const QByteArray &data, int type);
+    void receiveUserData(const QString &from, const QByteArray &data, int type);
     void sendMessage(const QHostAddress &address, const QString &msg);
+    void sendQizi(const QHostAddress &address,
+                  XYQiziWidget *qizi,
+                  const QPoint &point,
+                  bool revoked);
     void sendQiziWithUDP(const QHostAddress &address,
                          XYQiziWidget *qizi,
                          const QPoint &point,
@@ -40,6 +46,7 @@ public slots:
                          XYQiziWidget *qizi,
                          const QPoint &point,
                          bool revoked);
+    void peopleResponse(QAbstractSocket::SocketState state);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -53,6 +60,7 @@ private:
 
 private:
     static XYQishou       *instance;
+    QString                opponentQishou;
     QList<XYQiziWidget *>  hong_qizis;
     QList<XYQiziWidget *>  hei_qizis;
     XYUdpbroadcast        *UDPSocket;

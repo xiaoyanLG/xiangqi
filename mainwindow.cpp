@@ -90,12 +90,15 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->widget_2, SLOT(peopleOffline(QString,QHostAddress)));
     connect(me, SIGNAL(receiveMessage(QString,QString)),
             ui->widget_2, SLOT(receiveData(QString,QString)));
+    connect(me, SIGNAL(sideChanged()),
+            ui->widget_2, SLOT(qishouSideChanged()));
     connect(me, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool)), ui->widget,
             SLOT(moveQizi(XYQiziWidget*,QPoint,bool)));
 
     connect(ui->widget_2, SIGNAL(sendMessage(QHostAddress,QString)),
             me, SLOT(sendMessage(QHostAddress,QString)));
 
+    connect(me, SIGNAL(showMessages(QString, int)), this, SLOT(showMessage(QString, int)));
     connect(ui->widget, SIGNAL(showMessages(QString)), this, SLOT(showMessage(QString)));
 
     instance = this;
@@ -108,7 +111,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::showMessage(const QString &msg)
+void MainWindow::showMessage(const QString &msg, int times)
 {
     static QLabel *msgLabel = NULL;
     static QTimer *timer = NULL;
@@ -128,7 +131,14 @@ void MainWindow::showMessage(const QString &msg)
     msgLabel->raise();
     msgLabel->setText(msg);
     msgLabel->resize(width() - 200, 50);
-    timer->start(3000);
+    if (times == 0)
+    {
+        timer->stop();
+    }
+    else
+    {
+        timer->start(times);
+    }
     msgLabel->show();
     msgLabel->move(0, (height() - msgLabel->height()) / 2);
 }

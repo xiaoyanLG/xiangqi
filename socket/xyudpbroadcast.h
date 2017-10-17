@@ -18,7 +18,7 @@ public:
 signals:
     void peopleUpline(const QString &name, const QHostAddress &address);
     void peopleOffline(const QString &name, const QHostAddress &address);
-    void receiveData(const QString &from, const QByteArray &data, int type);
+    void receiveUserData(const QString &from, const QByteArray &data, int type);
 
 public slots:
     bool isLocalHostAddress(const QHostAddress &address);

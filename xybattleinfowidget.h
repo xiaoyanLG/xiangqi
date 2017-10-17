@@ -8,6 +8,7 @@ class QListWidget;
 class QListWidgetItem;
 class QTextEdit;
 class QLineEdit;
+class QPushButton;
 class XYBattleInfoWidget : public QWidget
 {
     Q_OBJECT
@@ -29,6 +30,7 @@ public slots:
     void receiveData(const QString &from, const QString &data);
 
 private slots:
+    void qishouSideChanged();
     void exit();
     void zoomIn();
     void zoomOut();
@@ -42,6 +44,7 @@ private slots:
 private:
     static XYBattleInfoWidget *instance;
     QMap<int, QHostAddress> allPeoplesMap;
+    QMap<int, QPushButton *> funcBtns;
     QPixmap qipanPixmap;
     QListWidget *allOnlinePeoplesWidget;
     QTextEdit   *messageBox;

@@ -172,7 +172,7 @@ void XYUdpbroadcast::receiveBroadcast()
                 {
                     return;
                 }
-                emit receiveData(validData, userData, type - USERDATA);
+                emit receiveUserData(QString::fromUtf8(validData), userData, type - USERDATA);
             }
             break;
         }

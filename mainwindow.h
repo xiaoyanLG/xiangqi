@@ -24,7 +24,7 @@ public slots:
     void appendMessage(const QString &from, const QString &message);
     void newParticipant(const QString &nick);
     void participantLeft(const QString &nick);
-    void showMessage(const QString &msg);
+    void showMessage(const QString &msg, int times = 3000);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
