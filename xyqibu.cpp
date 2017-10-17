@@ -28,7 +28,6 @@ void XYQibu::setEatenQizi(XYQiziWidget *eatenQizi)
     if (eatenQizi != NULL)
     {
         this->eatenPos = eatenQizi->getCurPos();
-        eatenQizi->setCurPos(QPoint(-1, -1));
     }
 }
 

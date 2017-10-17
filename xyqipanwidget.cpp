@@ -75,22 +75,11 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHis
 {
     XYQiziWidget *eaten = NULL;
     QPoint lastPos = qizi->curPos;
-    if (animation)
-    {
-        qizi->moveWithAnimation(allPos[row][column] -
-                                QPoint(qizi->width() / 2, qizi->height() / 2));
-    }
-    else
-    {
-        qizi->move(allPos[row][column] -
-                QPoint(qizi->width() / 2, qizi->height() / 2));
-    }
 
     if (qizi->type != XYQiziWidget::TEMP)
     {
         if (qiziInqipan[row][column] != NULL && qiziInqipan[row][column] != qizi)
         {
-            qiziInqipan[row][column]->setBeEaten(true);
             eaten = qiziInqipan[row][column];
         }
 
@@ -100,6 +89,21 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHis
             qiziInqipan[qizi->curPos.x()][qizi->curPos.y()] = NULL;
         }
         qiziInqipan[row][column] = qizi;
+    }
+
+    if (animation)
+    {
+        qizi->moveWithAnimation(allPos[row][column] -
+                                QPoint(qizi->width() / 2, qizi->height() / 2), eaten);
+    }
+    else
+    {
+        qizi->move(allPos[row][column] -
+                QPoint(qizi->width() / 2, qizi->height() / 2));
+        if (eaten != NULL)
+        {
+            eaten->setBeEaten(true);
+        }
     }
 
     qizi->curPos = QPoint(row, column);

@@ -6,10 +6,11 @@
 #include <QDebug>
 
 XYQiziWidget::XYQiziWidget(TYPE type, int times, QWidget *parent)
-    : QWidget(parent), beEaten(false), curPos(QPoint(-1, -1))
+    : QWidget(parent), beEaten(false), curPos(QPoint(-1, -1)), finishedQizi(NULL)
 {
     mopMoveAnimation = new QPropertyAnimation(this, "pos");
     mopMoveAnimation->setDuration(500);
+    connect(mopMoveAnimation, SIGNAL(finished()), this, SLOT(eatQizi()));
     setType(type, times);
     setVisible(false);
 }
@@ -19,8 +20,10 @@ XYQiziWidget::~XYQiziWidget()
 
 }
 
-void XYQiziWidget::moveWithAnimation(const QPoint &target)
+void XYQiziWidget::moveWithAnimation(const QPoint &target, XYQiziWidget *finishedQizi)
 {
+    this->finishedQizi = finishedQizi;
+
     mopMoveAnimation->setStartValue(pos());
     mopMoveAnimation->setEndValue(target);
     mopMoveAnimation->start();
@@ -495,4 +498,14 @@ void XYQiziWidget::resizeQizi(const QSize &size)
     resize(qizi.size() * ratio);
 
     XYQipanWidget::getInstance()->putQizi(this, curPos.x(), curPos.y(), false);
+}
+
+void XYQiziWidget::eatQizi()
+{
+    if (finishedQizi != NULL)
+    {
+        finishedQizi->setBeEaten(true);
+        finishedQizi->curPos = QPoint(-1, -1);
+        finishedQizi = NULL;
+    }
 }

@@ -13,7 +13,7 @@ public:
               HEI_ZU, HEI_PAO, HEI_CHE, HEI_MA, HEI_XIANG, HEI_SI, HEI_JIANG, TEMP};
     explicit XYQiziWidget(TYPE type, int times, QWidget *parent = 0);
     ~XYQiziWidget();
-    void moveWithAnimation(const QPoint &target);
+    void moveWithAnimation(const QPoint &target, XYQiziWidget *finishedQizi = NULL);
 
     // 切换视角
     void switchViews();
@@ -42,6 +42,7 @@ public:
 
 public slots:
     void resizeQizi(const QSize &size);
+    void eatQizi();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -56,6 +57,7 @@ protected:
     QPoint        moLastPos;
 
 private:
+    XYQiziWidget *finishedQizi;
     TYPE    type;
     int     times;
     bool    beEaten;
