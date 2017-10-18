@@ -26,9 +26,10 @@ public:
                            int times,
                            const QPoint &lastPoint,
                            QPoint &movePoint);
+    QMap<qint64, QList<QPoint> > getCurQiziMovablePoints(XYQiziWidget::SIDETYPE type);
 
 signals:
-    void qiziMoved(XYQiziWidget *qizi, const QPoint &point);
+    void qiziMoved(XYQiziWidget *qizi);
     void sizeChanged(const QSize &size);
     void showMessages(const QString &msg);
 

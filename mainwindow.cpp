@@ -31,8 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ai = new XYAIQishou(this);
     ai->setQipan(ui->widget);
-    connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*,QPoint)),
-            ai, SLOT(qiziMoved(XYQiziWidget*,QPoint)));
+    connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
+            ai, SLOT(qiziMoved(XYQiziWidget*)));
 
     connect(me, SIGNAL(peopleUpline(QString,QHostAddress)),
             ui->widget_2, SLOT(peopleUpline(QString,QHostAddress)));

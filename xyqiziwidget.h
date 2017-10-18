@@ -24,6 +24,8 @@ public:
     // 判断位置棋子是否可以走
     bool isMovable(int row, int column);
 
+    QList<QPoint> getAllMovablePoints();
+
     // 获取棋子是哪一方的
     SIDETYPE getSideType();
 

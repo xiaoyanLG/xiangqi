@@ -125,7 +125,7 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHis
         qizi->moveTimes++;
         allMoveTimes++;
 
-        emit qiziMoved(qizi, QPoint(row, column));
+        emit qiziMoved(qizi);
     }
 }
 
@@ -308,6 +308,17 @@ XYQiziWidget *XYQipanWidget::findQizi(XYQiziWidget::TYPE type, int times, const 
     }
 
     return find;
+}
+
+QMap<qint64, QList<QPoint> > XYQipanWidget::getCurQiziMovablePoints(XYQiziWidget::SIDETYPE type)
+{
+    QMap<qint64, QList<QPoint> > allPoints;
+
+    for (int i = 0; i < hong_qizis.size(); ++i)
+    {
+
+    }
+    return allPoints;
 }
 
 void XYQipanWidget::layoutQizi(bool keep)

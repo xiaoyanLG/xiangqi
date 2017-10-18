@@ -306,6 +306,201 @@ bool XYQiziWidget::isMovable(int row, int column)
     return yes;
 }
 
+QList<QPoint> XYQiziWidget::getAllMovablePoints()
+{
+    QList<QPoint> allMovablePoints;
+//    switch (type)
+//    {
+//    case HONG_ZU:
+//    case HEI_ZU:
+//        for (int i = 0; i < 10; ++i)
+//        {
+//            if (i != curPos.y() && isMovable(curPos.x(), i))
+//            {
+//                allMovablePoints.append(QPoint(curPos.x(), i));
+//            }
+//        }
+//        for (int i = 0; i < 9; ++i)
+//        {
+//            if (i != curPos.x() && isMovable(i, curPos.y()))
+//            {
+//                allMovablePoints.append(QPoint(i, curPos.y()));
+//            }
+//        }
+//        break;
+//    case HONG_PAO:
+//    case HEI_PAO:
+//        if (row == curPos.x())
+//        {
+//            int fuhao = column > curPos.y() ? 1 : -1;
+//            int count = qAbs(column - curPos.y());
+//            int obstacleTimes = 0;
+//            for (int i = 1; i < count; ++i)
+//            {
+//                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x(),
+//                                                                    curPos.y() + fuhao * i);
+//                if (obstacleQizi != NULL)
+//                {
+//                    obstacleTimes++;
+//                }
+//            }
+//            XYQiziWidget *lastQizi = qipan->getPositionQizi(row, column);
+//            if ((obstacleTimes == 1 && lastQizi != NULL)
+//                    || (obstacleTimes == 0 && lastQizi == NULL))
+//            {
+//                yes = true;
+//            }
+//        }
+//        else if (column == curPos.y())
+//        {
+//            int fuhao = row > curPos.x() ? 1 : -1;
+//            int count = qAbs(row - curPos.x());
+//            int obstacleTimes = 0;
+//            for (int i = 1; i < count; ++i)
+//            {
+//                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao * i,
+//                                                                    curPos.y());
+//                if (obstacleQizi != NULL)
+//                {
+//                    obstacleTimes++;
+//                }
+//            }
+//            XYQiziWidget *lastQizi = qipan->getPositionQizi(row, column);
+//            if ((obstacleTimes == 1 && lastQizi != NULL)
+//                    || (obstacleTimes == 0 && lastQizi == NULL))
+//            {
+//                yes = true;
+//            }
+//        }
+//        break;
+//    case HONG_CHE:
+//    case HEI_CHE:
+//        if (row == curPos.x())
+//        {
+//            int fuhao = column > curPos.y() ? 1 : -1;
+//            int count = qAbs(column - curPos.y());
+//            for (int i = 1; i < count; ++i)
+//            {
+//                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x(),
+//                                                                    curPos.y() + fuhao * i);
+//                if (obstacleQizi != NULL)
+//                {
+//                    return false;
+//                }
+//            }
+//            yes = true;
+//        }
+//        else if (column == curPos.y())
+//        {
+//            int fuhao = row > curPos.x() ? 1 : -1;
+//            int count = qAbs(row - curPos.x());
+//            for (int i = 1; i < count; ++i)
+//            {
+//                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao * i,
+//                                                                    curPos.y());
+//                if (obstacleQizi != NULL)
+//                {
+//                    return false;
+//                }
+//            }
+//            yes = true;
+//        }
+//        break;
+//    case HONG_MA:
+//    case HEI_MA:
+//        if (qAbs(row - curPos.x()) + qAbs(column - curPos.y()) == 3)
+//        {
+//            // 判断是否有挡路棋子
+//            if (qAbs(row - curPos.x()) == 2)
+//            {
+//                int fuhao = row > curPos.x() ? 1 : -1;
+//                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao,
+//                                                                    curPos.y());
+//                if (obstacleQizi != NULL)
+//                {
+//                    return false;
+//                }
+
+//            }
+//            else if (qAbs(column - curPos.y()) == 2)
+//            {
+//                int fuhao = column > curPos.y() ? 1 : -1;
+//                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x(),
+//                                                                    curPos.y() + fuhao);
+//                if (obstacleQizi != NULL)
+//                {
+//                    return false;
+//                }
+//            }
+//            yes = true;
+//        }
+//        break;
+//    case HONG_XIANG:
+//    case HEI_XIANG:
+//        if (qAbs(row - curPos.x()) == 2
+//                && qAbs(column - curPos.y()) == 2
+//                && (row <= 4 && curPos.x() <= 4
+//                    || row >= 5 && curPos.x() >= 5) )
+//        {
+//            // 判断是否有挡路棋子
+//            XYQiziWidget *obstacleQizi = qipan->getPositionQizi((curPos.x() + row)/2,
+//                                                                (curPos.y() + column)/2);
+//            if (obstacleQizi != NULL)
+//            {
+//                return false;
+//            }
+//            yes = true;
+//        }
+//        break;
+//    case HONG_SI:
+//    case HEI_SI:
+//        if (qAbs(row - curPos.x()) == 1
+//                && qAbs(column - curPos.y()) == 1
+//                && (column >= 3 && column <= 5)
+//                && (row >= 7 || row <= 2) )
+//        {
+//            yes = true;
+//        }
+//        break;
+//    case HONG_JIANG:
+//    case HEI_JIANG:
+//        if (qAbs(row - curPos.x()) + qAbs(column - curPos.y()) == 1
+//                && (column >= 3 && column <= 5)
+//                && ((defaultPos.x() > 5 && row >= 7)
+//                || (defaultPos.x() < 5 && row <= 2)))
+//        {
+//            yes = true;
+//        }
+//        else if (curPos.y() == column)
+//        {
+//            int fuhao = row > curPos.x() ? 1 : -1;
+//            int count = qAbs(row - curPos.x());
+//            for (int i = 1; i < count; ++i)
+//            {
+//                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
+//                if (obstacleQizi != NULL)
+//                {
+//                    return false;
+//                }
+//            }
+//            XYQiziWidget *obstacleQizi = qipan->getPositionQizi(row, column);
+//            if (obstacleQizi != NULL)
+//            {
+//                if (obstacleQizi->type == HEI_JIANG
+//                        || obstacleQizi->type == HONG_JIANG)
+//                {
+//                    yes = true;
+//                }
+//            }
+//        }
+//        break;
+//    default:
+//        break;
+//    }
+
+    return allMovablePoints;
+}
+
 XYQiziWidget::SIDETYPE XYQiziWidget::getSideType()
 {
     if (type >= HONG_ZU

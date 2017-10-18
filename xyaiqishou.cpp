@@ -12,7 +12,7 @@ XYAIQishou *XYAIQishou::getInstance()
 }
 
 XYAIQishou::XYAIQishou(QObject *parent)
-    : QObject(parent),
+    : QThread(parent),
       level(3),
       aiType(AUTO),
       sideType(XYQiziWidget::UNKNOWN)
@@ -45,8 +45,10 @@ void XYAIQishou::setSideType(XYQiziWidget::SIDETYPE type)
     this->sideType = type;
 }
 
-void XYAIQishou::qiziMoved(XYQiziWidget *qizi, const QPoint &point)
+void XYAIQishou::qiziMoved(XYQiziWidget *qizi)
 {
+    hongCurMovablePoints = qipan->getCurQiziMovablePoints(XYQiziWidget::RED);
+    heiCurMovablePoints = qipan->getCurQiziMovablePoints(XYQiziWidget::BLACK);
     qDebug() << (XYQiziWidget::TYPE)qizi->type << qizi->moveTimes << qipan->allMoveTimes;
 }
 

@@ -1,10 +1,10 @@
 ﻿#ifndef XYAIQISHOU_H
 #define XYAIQISHOU_H
 
-#include <QObject>
+#include <QThread>
 #include "xyqipanwidget.h"
 
-class XYAIQishou : public QObject
+class XYAIQishou : public QThread
 {
     Q_OBJECT
 public:
@@ -21,19 +21,21 @@ public slots:
     void setLevel(int level);
     void setAiType(AITYPE type);
     void setSideType(XYQiziWidget::SIDETYPE type);
-    void qiziMoved(XYQiziWidget *qizi, const QPoint &point);
+    void qiziMoved(XYQiziWidget *qizi);
 
 private:
     static XYAIQishou     *instance;
     XYQipanWidget         *qipan;
-    int                    level;
-    XYQiziWidget::SIDETYPE sideType;
-    AITYPE                 aiType;
+    int                    level;       // 记录AI技术水平
+    XYQiziWidget::SIDETYPE sideType;    // 记录AI走哪一方
+    AITYPE                 aiType;      // 记录AI类型（进攻型，防守型，全能型）
+    XYQiziWidget          *lastQizi;    // 记录上一次移动的棋子
 
-    QList<QPoint>          hongLastMovablePoints;
-    QList<QPoint>          hongCurMovablePoints;
-    QList<QPoint>          heiLastMovablePoints;
-    QList<QPoint>          heiCurMovablePoints;
+    // qint64 存放棋子的指针，list存放该棋子能移动的所有坐标
+    QMap<qint64, QList<QPoint> > hongLastMovablePoints;
+    QMap<qint64, QList<QPoint> > hongCurMovablePoints;
+    QMap<qint64, QList<QPoint> > heiLastMovablePoints;
+    QMap<qint64, QList<QPoint> > heiCurMovablePoints;
 };
 
 #endif // XYAIQISHOU_H
