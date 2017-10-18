@@ -27,6 +27,7 @@ void XYQiziWidget::moveWithAnimation(const QPoint &target, XYQiziWidget *finishe
     mopMoveAnimation->setStartValue(pos());
     mopMoveAnimation->setEndValue(target);
     mopMoveAnimation->start();
+    raise();
 }
 
 void XYQiziWidget::switchViews()
