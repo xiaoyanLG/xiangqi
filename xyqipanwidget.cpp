@@ -26,6 +26,7 @@ XYQipanWidget::XYQipanWidget(QWidget *parent)
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
     qipanPixmap.load(":/xiangqi/qipan.png");
 
+    initQizi();
     instance = this;
 }
 
@@ -193,11 +194,6 @@ XYQiziWidget *XYQipanWidget::getPositionQizi(int row, int column)
     return qiziInqipan[row][column];
 }
 
-void XYQipanWidget::setTempQizi(XYQiziWidget *qizi)
-{
-    tempQizi = qizi;
-}
-
 void XYQipanWidget::raiseTempQizi()
 {
     if (tempQizi != NULL)
@@ -252,8 +248,102 @@ void XYQipanWidget::revokeLastQibu(bool socket)
     }
 }
 
+XYQiziWidget *XYQipanWidget::findQizi(XYQiziWidget::TYPE type, int times, const QPoint &lastPoint, QPoint &movePoint)
+{
+    XYQiziWidget *find = NULL;
+    for (int i = 0; i < hong_qizis.size(); ++i)
+    {
+        XYQiziWidget *qizi = hong_qizis.at(i);
+        if (qizi->type == type && qizi->times == times)
+        {
+            if (lastPoint == qizi->curPos)
+            {
+                find = qizi;
+            }
+            else if (lastPoint == qizi->getSwitchViewsPos(qizi->curPos))
+            {
+                movePoint = qizi->getSwitchViewsPos(movePoint);
+                find = qizi;
+            }
+            else
+            {
+                return NULL;
+            }
+        }
+    }
+
+    for (int i = 0; i < hei_qizis.size(); ++i)
+    {
+        XYQiziWidget *qizi = hei_qizis.at(i);
+        if (qizi->type == type && qizi->times == times)
+        {
+            if (lastPoint == qizi->curPos)
+            {
+                find = qizi;
+            }
+            else if (lastPoint == qizi->getSwitchViewsPos(qizi->curPos))
+            {
+                movePoint = qizi->getSwitchViewsPos(movePoint);
+                find = qizi;
+            }
+            else
+            {
+                return NULL;
+            }
+        }
+    }
+
+    return find;
+}
+
+void XYQipanWidget::layoutQizi(bool keep)
+{
+    static bool up = true;
+    clear(true);
+    if (keep)
+    {
+        up = !up;
+    }
+    for (int i = 0; i < hong_qizis.size(); ++i)
+    {
+        hong_qizis.at(i)->setVisible(true);
+        putQiziToDefaultPos(hong_qizis.at(i), up);
+    }
+
+    for (int i = 0; i < hei_qizis.size(); ++i)
+    {
+        hei_qizis.at(i)->setVisible(true);
+        putQiziToDefaultPos(hei_qizis.at(i), !up);
+    }
+    up = !up;
+}
+
 void XYQipanWidget::switchViews()
 {
+    clear(false);
+
+    // 切换棋子位置
+    for (int i = 0; i < hong_qizis.size(); ++i)
+    {
+        XYQiziWidget *qizi = hong_qizis.at(i);
+        qizi->switchViews();
+        if (!qizi->getBeEaten())
+        {
+            putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+        }
+    }
+
+    for (int i = 0; i < hei_qizis.size(); ++i)
+    {
+        XYQiziWidget *qizi = hei_qizis.at(i);
+        qizi->switchViews();
+        if (!qizi->getBeEaten())
+        {
+            putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+        }
+    }
+
+    // 切换历史记录的位置
     QStack<XYQibu *>::iterator it = historyQibus.begin();
     while (it != historyQibus.end())
     {
@@ -388,6 +478,62 @@ void XYQipanWidget::resizeEvent(QResizeEvent *event)
 
     emit sizeChanged(event->size());
     QWidget::resizeEvent(event);
+}
+
+void XYQipanWidget::initQizi()
+{
+    for (int i = XYQiziWidget::HONG_ZU; i <= XYQiziWidget::HONG_JIANG; ++i)
+    {
+        int times = 0;
+        XYQiziWidget::TYPE type = (XYQiziWidget::TYPE)i;
+        switch (type)
+        {
+        case XYQiziWidget::HONG_ZU:
+            times = 5;
+            break;
+        case XYQiziWidget::HONG_JIANG:
+            times = 1;
+            break;
+        default:
+            times = 2;
+            break;
+        }
+
+        for (int j = 0; j < times; ++j)
+        {
+            XYQiziWidget *qizi = new XYQiziWidget(type, j, this);
+            hong_qizis.append(qizi);
+            connect(this, SIGNAL(sizeChanged(QSize)), qizi, SLOT(resizeQizi(QSize)));
+        }
+    }
+    for (int i = XYQiziWidget::HEI_ZU; i <= XYQiziWidget::HEI_JIANG; ++i)
+    {
+        int times = 0;
+        XYQiziWidget::TYPE type = (XYQiziWidget::TYPE)i;
+        switch (type)
+        {
+        case XYQiziWidget::HEI_ZU:
+            times = 5;
+            break;
+        case XYQiziWidget::HEI_JIANG:
+            times = 1;
+            break;
+        default:
+            times = 2;
+            break;
+        }
+
+        for (int j = 0; j < times; ++j)
+        {
+            XYQiziWidget *qizi = new XYQiziWidget(type, j, this);
+            hei_qizis.append(qizi);
+            connect(this, SIGNAL(sizeChanged(QSize)), qizi, SLOT(resizeQizi(QSize)));
+        }
+    }
+
+    // 准备临时棋子
+    tempQizi = new XYQiziWidget(XYQiziWidget::TEMP, 0, this);
+    connect(this, SIGNAL(sizeChanged(QSize)), tempQizi, SLOT(resizeQizi(QSize)));
 }
 
 QPoint XYQipanWidget::getQiziCurNearestPos(XYQiziWidget *qizi)

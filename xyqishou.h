@@ -6,6 +6,7 @@
 #include "xyudpbroadcast.h"
 #include "xytcpserver.h"
 #include "xyqiziwidget.h"
+#include "xyqipanwidget.h"
 
 class XYQishou : public QObject
 {
@@ -15,7 +16,7 @@ public:
     static XYQishou *getInstance();
     ~XYQishou();
 
-    void setQizi(const QList<XYQiziWidget *> &qizis, XYQiziWidget::SIDETYPE type);
+    void setQipan(XYQipanWidget *qipan);
     XYQiziWidget::SIDETYPE getSideType() const;
     QIcon getSideIcon();
     void setSideType(XYQiziWidget::SIDETYPE type);
@@ -53,16 +54,11 @@ protected:
 
 private:
     explicit XYQishou(QObject *parent = 0);
-    XYQiziWidget *findQizi(XYQiziWidget::TYPE type,
-                           int times,
-                           const QPoint &lastPoint,
-                           QPoint &movePoint);
 
 private:
     static XYQishou       *instance;
+    XYQipanWidget         *qipan;
     QString                opponentQishou;
-    QList<XYQiziWidget *>  hong_qizis;
-    QList<XYQiziWidget *>  hei_qizis;
     XYUdpbroadcast        *UDPSocket;
     XYTcpServer           *TCPServer;
     XYQiziWidget::SIDETYPE type;

@@ -24,65 +24,10 @@ MainWindow::MainWindow(QWidget *parent) :
                    | Qt::WindowSystemMenuHint
                    | Qt::WindowMinimizeButtonHint);
 
-    for (int i = XYQiziWidget::HONG_ZU; i <= XYQiziWidget::HONG_JIANG; ++i)
-    {
-        int times = 0;
-        XYQiziWidget::TYPE type = (XYQiziWidget::TYPE)i;
-        switch (type)
-        {
-        case XYQiziWidget::HONG_ZU:
-            times = 5;
-            break;
-        case XYQiziWidget::HONG_JIANG:
-            times = 1;
-            break;
-        default:
-            times = 2;
-            break;
-        }
-
-        for (int j = 0; j < times; ++j)
-        {
-            XYQiziWidget *qizi = new XYQiziWidget(type, j, this);
-            hong_qizis.append(qizi);
-            connect(ui->widget, SIGNAL(sizeChanged(QSize)), qizi, SLOT(resizeQizi(QSize)));
-        }
-    }
-    for (int i = XYQiziWidget::HEI_ZU; i <= XYQiziWidget::HEI_JIANG; ++i)
-    {
-        int times = 0;
-        XYQiziWidget::TYPE type = (XYQiziWidget::TYPE)i;
-        switch (type)
-        {
-        case XYQiziWidget::HEI_ZU:
-            times = 5;
-            break;
-        case XYQiziWidget::HEI_JIANG:
-            times = 1;
-            break;
-        default:
-            times = 2;
-            break;
-        }
-
-        for (int j = 0; j < times; ++j)
-        {
-            XYQiziWidget *qizi = new XYQiziWidget(type, j, this);
-            hei_qizis.append(qizi);
-            connect(ui->widget, SIGNAL(sizeChanged(QSize)), qizi, SLOT(resizeQizi(QSize)));
-        }
-    }
-
-    // 准备临时棋子
-    tempQizi = new XYQiziWidget(XYQiziWidget::TEMP, 0, this);
-    connect(ui->widget, SIGNAL(sizeChanged(QSize)), tempQizi, SLOT(resizeQizi(QSize)));
-    ui->widget->setTempQizi(tempQizi);
-
     // 创建棋手
     me = XYQishou::getInstance();
     me->setParent(this);
-    me->setQizi(hong_qizis, XYQiziWidget::RED);
-    me->setQizi(hei_qizis, XYQiziWidget::BLACK);
+    me->setQipan(ui->widget);
 
     connect(me, SIGNAL(peopleUpline(QString,QHostAddress)),
             ui->widget_2, SLOT(peopleUpline(QString,QHostAddress)));
@@ -167,64 +112,12 @@ void MainWindow::testsssss()
 
 void MainWindow::layoutQizi(bool keep)
 {
-    static bool up = true;
-    ui->widget->clear(true);
-    if (keep)
-    {
-        up = !up;
-    }
-    for (int i = 0; i < hong_qizis.size(); ++i)
-    {
-        hong_qizis.at(i)->setVisible(true);
-        ui->widget->putQiziToDefaultPos(hong_qizis.at(i), up);
-    }
-
-    for (int i = 0; i < hei_qizis.size(); ++i)
-    {
-        hei_qizis.at(i)->setVisible(true);
-        ui->widget->putQiziToDefaultPos(hei_qizis.at(i), !up);
-    }
-    up = !up;
+    ui->widget->layoutQizi(keep);
 }
 
 void MainWindow::switchViews()
 {
-    ui->widget->clear(false);
-    for (int i = 0; i < hong_qizis.size(); ++i)
-    {
-        XYQiziWidget *qizi = hong_qizis.at(i);
-        qizi->switchViews();
-        if (!qizi->getBeEaten())
-        {
-            ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
-        }
-    }
-
-    for (int i = 0; i < hei_qizis.size(); ++i)
-    {
-        XYQiziWidget *qizi = hei_qizis.at(i);
-        qizi->switchViews();
-        if (!qizi->getBeEaten())
-        {
-            ui->widget->putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
-        }
-    }
     ui->widget->switchViews();
-}
-
-void MainWindow::appendMessage(const QString &from, const QString &message)
-{
-    qDebug() << __FUNCTION__;
-}
-
-void MainWindow::newParticipant(const QString &nick)
-{
-    qDebug() << __FUNCTION__;
-}
-
-void MainWindow::participantLeft(const QString &nick)
-{
-    qDebug() << __FUNCTION__;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)

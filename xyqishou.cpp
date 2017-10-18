@@ -4,7 +4,7 @@
 
 XYQishou *XYQishou::instance = NULL;
 XYQishou::XYQishou(QObject *parent)
-    : QObject(parent), type(XYQiziWidget::RED)
+    : QObject(parent), type(XYQiziWidget::RED), qipan(NULL)
 {
     UDPSocket = new XYUdpbroadcast(this);
     TCPServer = new XYTcpServer(this);
@@ -25,54 +25,6 @@ XYQishou::XYQishou(QObject *parent)
     startTimer(1000);
 }
 
-XYQiziWidget *XYQishou::findQizi(XYQiziWidget::TYPE type, int times, const QPoint &lastPoint, QPoint &movePoint)
-{
-    XYQiziWidget *find = NULL;
-    for (int i = 0; i < hong_qizis.size(); ++i)
-    {
-        XYQiziWidget *qizi = hong_qizis.at(i);
-        if (qizi->type == type && qizi->times == times)
-        {
-            if (lastPoint == qizi->curPos)
-            {
-                find = qizi;
-            }
-            else if (lastPoint == qizi->getSwitchViewsPos(qizi->curPos))
-            {
-                movePoint = qizi->getSwitchViewsPos(movePoint);
-                find = qizi;
-            }
-            else
-            {
-                return NULL;
-            }
-        }
-    }
-
-    for (int i = 0; i < hei_qizis.size(); ++i)
-    {
-        XYQiziWidget *qizi = hei_qizis.at(i);
-        if (qizi->type == type && qizi->times == times)
-        {
-            if (lastPoint == qizi->curPos)
-            {
-                find = qizi;
-            }
-            else if (lastPoint == qizi->getSwitchViewsPos(qizi->curPos))
-            {
-                movePoint = qizi->getSwitchViewsPos(movePoint);
-                find = qizi;
-            }
-            else
-            {
-                return NULL;
-            }
-        }
-    }
-
-    return find;
-}
-
 XYQishou *XYQishou::getInstance()
 {
     if (instance == NULL)
@@ -87,19 +39,9 @@ XYQishou::~XYQishou()
     UDPSocket->writeOfflineDatagram();
 }
 
-void XYQishou::setQizi(const QList<XYQiziWidget *> &qizis, XYQiziWidget::SIDETYPE type)
+void XYQishou::setQipan(XYQipanWidget *qipan)
 {
-    switch (type)
-    {
-    case XYQiziWidget::RED:
-        hong_qizis = qizis;
-        break;
-    case XYQiziWidget::BLACK:
-        hei_qizis = qizis;
-        break;
-    default:
-        break;
-    }
+    this->qipan = qipan;
 }
 
 XYQiziWidget::SIDETYPE XYQishou::getSideType() const
@@ -172,10 +114,13 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
             >> lastPoint
             >> movePoint
             >> revoked;
-        XYQiziWidget *qizi = findQizi((XYQiziWidget::TYPE)type, times, lastPoint, movePoint);
-        if (qizi != NULL)
+        if (qipan != NULL)
         {
-            emit moveQizi(qizi, movePoint, revoked);
+            XYQiziWidget *qizi = qipan->findQizi((XYQiziWidget::TYPE)type, times, lastPoint, movePoint);
+            if (qizi != NULL)
+            {
+                emit moveQizi(qizi, movePoint, revoked);
+            }
         }
         break;
     }
@@ -189,7 +134,10 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
             {
                 TCPServer->writeUserData(QByteArray(), ACCEPT);
                 opponentQishou = from;
-                MainWindow::getInstance()->layoutQizi(true);
+                if (qipan != NULL)
+                {
+                    qipan->layoutQizi(true);
+                }
             }
             else
             {
@@ -223,7 +171,10 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
         if (data.isEmpty())
         {
             opponentQishou = from;
-            MainWindow::getInstance()->layoutQizi(true);
+            if (qipan != NULL)
+            {
+                qipan->layoutQizi(true);
+            }
             emit showMessages(QString("%1: %2").arg(from).arg(QString::fromStdWString(L"接受对战，请等待对方选择棋方！")), 0);
         }
         break;

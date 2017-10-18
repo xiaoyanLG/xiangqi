@@ -11,7 +11,6 @@ class XYQiziWidget;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
     static MainWindow *getInstance();
     explicit MainWindow(QWidget *parent = 0);
@@ -21,9 +20,6 @@ public:
 public slots:
     void layoutQizi(bool keep = false);
     void switchViews();
-    void appendMessage(const QString &from, const QString &message);
-    void newParticipant(const QString &nick);
-    void participantLeft(const QString &nick);
     void showMessage(const QString &msg, int times = 3000);
 
 protected:
@@ -36,11 +32,8 @@ protected:
     QPoint        moLastPos;
 
 private:
-    XYQishou *me;
-    QList<XYQiziWidget *> hong_qizis;
-    QList<XYQiziWidget *> hei_qizis;
-    XYQiziWidget *tempQizi;
     static MainWindow *instance;
+    XYQishou *me;
     Ui::MainWindow *ui;
 };
 

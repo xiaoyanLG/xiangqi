@@ -34,7 +34,7 @@ public:
     void setBeEaten(bool beEaten);
 
     QPoint getCurPos() const;
-    QPoint getSwitchViewsPos(const QPoint &point);
+    static QPoint getSwitchViewsPos(const QPoint &point);
     void setCurPos(const QPoint &value);
 
     QPixmap getPixmap() const;

@@ -33,12 +33,7 @@ void XYQibu::setEatenQizi(XYQiziWidget *eatenQizi)
 
 void XYQibu::switchViews()
 {
-    int x = 9 - curPos.x();
-    int y = 8 - curPos.y();
-    curPos = QPoint(x, y);
-
-    x = 9 - eatenPos.x();
-    y = 8 - eatenPos.y();
-    eatenPos = QPoint(x, y);
+    curPos = XYQiziWidget::getSwitchViewsPos(curPos);
+    eatenPos = XYQiziWidget::getSwitchViewsPos(eatenPos);
 }
 

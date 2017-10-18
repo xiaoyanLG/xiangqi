@@ -32,16 +32,11 @@ void XYQiziWidget::moveWithAnimation(const QPoint &target, XYQiziWidget *finishe
 
 void XYQiziWidget::switchViews()
 {
-    int x = 9 - defaultPos.x();
-    int y = 8 - defaultPos.y();
-
-    defaultPos = QPoint(x, y);
+    defaultPos = getSwitchViewsPos(defaultPos);
 
     if (!beEaten)
     {
-        x = 9 - curPos.x();
-        y = 8 - curPos.y();
-        curPos = QPoint(x, y);
+        curPos = getSwitchViewsPos(curPos);
     }
 }
 
