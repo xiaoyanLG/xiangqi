@@ -36,12 +36,12 @@ XYQipanWidget::~XYQipanWidget()
 
 void XYQipanWidget::clear(bool clearHistory)
 {
-    lastSideType = XYQiziWidget::UNKNOWN;
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
     if (clearHistory)
     {
         qDeleteAll(historyQibus);
         historyQibus.clear();
+        lastSideType = XYQiziWidget::UNKNOWN;
     }
 }
 
