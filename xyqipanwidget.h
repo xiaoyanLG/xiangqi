@@ -28,6 +28,7 @@ public:
                            QPoint &movePoint);
 
 signals:
+    void qiziMoved(XYQiziWidget *qizi, const QPoint &point);
     void sizeChanged(const QSize &size);
     void showMessages(const QString &msg);
 
@@ -49,14 +50,17 @@ private:
     static XYQipanWidget *instance;          // 棋盘单例
     QList<XYQiziWidget *> hong_qizis;        // 所有的红棋子
     QList<XYQiziWidget *> hei_qizis;         // 所有的黑棋子
-    XYQiziWidget *tempQizi;                  // 临时棋子，阴影显示当前可移动的棋步
-    QPixmap qipanPixmap;                     // 棋盘背景图片
-    QPoint  allPos[10][9];                   // 记录棋盘上的可下棋的点
-    XYQiziWidget *qiziInqipan[10][9];        // 记录棋盘当前棋子所在
-    QStack<XYQibu *> historyQibus;           // 记录历史的棋步
+    XYQiziWidget         *tempQizi;          // 临时棋子，阴影显示当前可移动的棋步
+    QPixmap               qipanPixmap;       // 棋盘背景图片
+    QPoint                allPos[10][9];     // 记录棋盘上的可下棋的点
+    XYQiziWidget         *qiziInqipan[10][9];// 记录棋盘当前棋子所在
+    QStack<XYQibu *>      historyQibus;      // 记录历史的棋步
+    int                   allMoveTimes;      // 记录开局以来移动的总次数
 
     XYQiziWidget::SIDETYPE lastSideType;     // 记录上次下棋的棋方
 
+    friend class XYQishou;
+    friend class XYAIQishou;
 };
 
 #endif // XYQIPANWIDGET_H

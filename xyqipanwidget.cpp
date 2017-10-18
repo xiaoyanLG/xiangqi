@@ -21,7 +21,10 @@ XYQipanWidget *XYQipanWidget::getInstance()
 }
 
 XYQipanWidget::XYQipanWidget(QWidget *parent)
-    : QWidget(parent), tempQizi(NULL), lastSideType(XYQiziWidget::UNKNOWN)
+    : QWidget(parent),
+      tempQizi(NULL),
+      lastSideType(XYQiziWidget::UNKNOWN),
+      allMoveTimes(0)
 {
     memset(qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
     qipanPixmap.load(":/xiangqi/qipan.png");
@@ -43,6 +46,7 @@ void XYQipanWidget::clear(bool clearHistory)
         qDeleteAll(historyQibus);
         historyQibus.clear();
         lastSideType = XYQiziWidget::UNKNOWN;
+        allMoveTimes = 0;
     }
 }
 
@@ -116,6 +120,12 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHis
 
         // 记录当前下子的棋方
         lastSideType = qizi->getSideType();
+
+        // 当前移动棋子移动次数加1
+        qizi->moveTimes++;
+        allMoveTimes++;
+
+        emit qiziMoved(qizi, QPoint(row, column));
     }
 }
 
@@ -238,6 +248,10 @@ void XYQipanWidget::revokeLastQibu(bool socket)
                             last->target, last->curPos, true);
             }
             revokeQizi(last->target, last->curPos.x(), last->curPos.y(), false);
+
+            // 棋子移动次数减1
+            last->target->moveTimes--;
+            allMoveTimes--;
         }
         if (last->eatenQizi != NULL)
         {
@@ -307,12 +321,14 @@ void XYQipanWidget::layoutQizi(bool keep)
     for (int i = 0; i < hong_qizis.size(); ++i)
     {
         hong_qizis.at(i)->setVisible(true);
+        hong_qizis.at(i)->moveTimes = 0;
         putQiziToDefaultPos(hong_qizis.at(i), up);
     }
 
     for (int i = 0; i < hei_qizis.size(); ++i)
     {
         hei_qizis.at(i)->setVisible(true);
+        hei_qizis.at(i)->moveTimes = 0;
         putQiziToDefaultPos(hei_qizis.at(i), !up);
     }
     up = !up;

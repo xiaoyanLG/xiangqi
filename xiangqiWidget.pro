@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     chineseInput/xytooltips.cpp \
     chineseInput/xytranslateitem.cpp \
     chineseInput/xytranslatemodel.cpp \
-    chineseInput/xytranslateview.cpp
+    chineseInput/xytranslateview.cpp \
+    xyaiqishou.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
@@ -56,7 +57,8 @@ HEADERS  += mainwindow.h \
     chineseInput/xytooltips.h \
     chineseInput/xytranslateitem.h \
     chineseInput/xytranslatemodel.h \
-    chineseInput/xytranslateview.h
+    chineseInput/xytranslateview.h \
+    xyaiqishou.h
 
 FORMS    += mainwindow.ui
 

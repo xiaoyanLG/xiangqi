@@ -6,7 +6,11 @@
 #include <QDebug>
 
 XYQiziWidget::XYQiziWidget(TYPE type, int times, QWidget *parent)
-    : QWidget(parent), beEaten(false), curPos(QPoint(-1, -1)), finishedQizi(NULL)
+    : QWidget(parent),
+      beEaten(false),
+      curPos(QPoint(-1, -1)),
+      finishedQizi(NULL),
+      moveTimes(0)
 {
     mopMoveAnimation = new QPropertyAnimation(this, "pos");
     mopMoveAnimation->setDuration(500);
@@ -340,6 +344,7 @@ void XYQiziWidget::paintEvent(QPaintEvent *event)
     }
     painter.drawPixmap(rect(), getPixMapByType(type));
 //    painter.drawText(rect(), QString::number(times));
+//    painter.drawText(rect(), QString::number(moveTimes));
 }
 
 void XYQiziWidget::mousePressEvent(QMouseEvent *event)

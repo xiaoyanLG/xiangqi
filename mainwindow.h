@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "xyqishou.h"
+#include "xyaiqishou.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,6 +35,7 @@ protected:
 private:
     static MainWindow *instance;
     XYQishou *me;
+    XYAIQishou *ai;
     Ui::MainWindow *ui;
 };
 
