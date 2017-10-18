@@ -68,11 +68,14 @@ void MainWindow::showMessage(const QString &msg, int times)
         connect(timer, SIGNAL(timeout()), msgLabel, SLOT(close()));
         QFont font = msgLabel->font();
         font.setFamily(QString::fromStdWString(L"华文行楷"));
-        font.setPointSize(25);
+        font.setPointSize(25 * height() / 800);
         msgLabel->setFont(font);
         msgLabel->setStyleSheet("background-color: rgb(0, 0, 0, 0); "
                                 "color: rgb(248, 237, 56)");
     }
+    QFont font = msgLabel->font();
+    font.setPointSize(25 * height() / 800);
+    msgLabel->setFont(font);
     msgLabel->raise();
     msgLabel->setText(msg);
     msgLabel->resize(width() - 200, 50);

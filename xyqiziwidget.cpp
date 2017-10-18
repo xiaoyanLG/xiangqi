@@ -489,7 +489,7 @@ void XYQiziWidget::setBeEaten(bool beEaten)
 void XYQiziWidget::resizeQizi(const QSize &size)
 {
     static QPixmap qipan_pixmap(":/xiangqi/qipan.png");
-    qreal ratio = 0.85 * size.width() / qipan_pixmap.size().width();
+    qreal ratio = 0.9 * size.height() / qipan_pixmap.size().height();
     QPixmap qizi = getPixMapByType(type);
     resize(qizi.size() * ratio);
 
