@@ -101,6 +101,7 @@ QPoint XYQiziWidget::getQiziDefaultPos(bool up)
 
 bool XYQiziWidget::isMovable(int row, int column)
 {
+    XYQipanWidget *qipan = qobject_cast<XYQipanWidget *>(parentWidget());
     bool yes = false;
     switch (type)
     {
@@ -129,15 +130,14 @@ bool XYQiziWidget::isMovable(int row, int column)
             int obstacleTimes = 0;
             for (int i = 1; i < count; ++i)
             {
-                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                        ->getPositionQizi(curPos.x(), curPos.y() + fuhao * i);
+                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x(),
+                                                                    curPos.y() + fuhao * i);
                 if (obstacleQizi != NULL)
                 {
                     obstacleTimes++;
                 }
             }
-            XYQiziWidget *lastQizi = XYQipanWidget::getInstance()
-                    ->getPositionQizi(row, column);
+            XYQiziWidget *lastQizi = qipan->getPositionQizi(row, column);
             if ((obstacleTimes == 1 && lastQizi != NULL)
                     || (obstacleTimes == 0 && lastQizi == NULL))
             {
@@ -151,15 +151,14 @@ bool XYQiziWidget::isMovable(int row, int column)
             int obstacleTimes = 0;
             for (int i = 1; i < count; ++i)
             {
-                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                        ->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
+                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao * i,
+                                                                    curPos.y());
                 if (obstacleQizi != NULL)
                 {
                     obstacleTimes++;
                 }
             }
-            XYQiziWidget *lastQizi = XYQipanWidget::getInstance()
-                    ->getPositionQizi(row, column);
+            XYQiziWidget *lastQizi = qipan->getPositionQizi(row, column);
             if ((obstacleTimes == 1 && lastQizi != NULL)
                     || (obstacleTimes == 0 && lastQizi == NULL))
             {
@@ -175,8 +174,8 @@ bool XYQiziWidget::isMovable(int row, int column)
             int count = qAbs(column - curPos.y());
             for (int i = 1; i < count; ++i)
             {
-                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                        ->getPositionQizi(curPos.x(), curPos.y() + fuhao * i);
+                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x(),
+                                                                    curPos.y() + fuhao * i);
                 if (obstacleQizi != NULL)
                 {
                     return false;
@@ -190,8 +189,8 @@ bool XYQiziWidget::isMovable(int row, int column)
             int count = qAbs(row - curPos.x());
             for (int i = 1; i < count; ++i)
             {
-                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                        ->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
+                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao * i,
+                                                                    curPos.y());
                 if (obstacleQizi != NULL)
                 {
                     return false;
@@ -208,8 +207,8 @@ bool XYQiziWidget::isMovable(int row, int column)
             if (qAbs(row - curPos.x()) == 2)
             {
                 int fuhao = row > curPos.x() ? 1 : -1;
-                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                        ->getPositionQizi(curPos.x() + fuhao, curPos.y());
+                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao,
+                                                                    curPos.y());
                 if (obstacleQizi != NULL)
                 {
                     return false;
@@ -219,8 +218,8 @@ bool XYQiziWidget::isMovable(int row, int column)
             else if (qAbs(column - curPos.y()) == 2)
             {
                 int fuhao = column > curPos.y() ? 1 : -1;
-                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                        ->getPositionQizi(curPos.x(), curPos.y() + fuhao);
+                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x(),
+                                                                    curPos.y() + fuhao);
                 if (obstacleQizi != NULL)
                 {
                     return false;
@@ -237,8 +236,8 @@ bool XYQiziWidget::isMovable(int row, int column)
                     || row >= 5 && curPos.x() >= 5) )
         {
             // 判断是否有挡路棋子
-            XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                    ->getPositionQizi((curPos.x() + row)/2, (curPos.y() + column)/2);
+            XYQiziWidget *obstacleQizi = qipan->getPositionQizi((curPos.x() + row)/2,
+                                                                (curPos.y() + column)/2);
             if (obstacleQizi != NULL)
             {
                 return false;
@@ -271,15 +270,13 @@ bool XYQiziWidget::isMovable(int row, int column)
             int count = qAbs(row - curPos.x());
             for (int i = 1; i < count; ++i)
             {
-                XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                        ->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
+                XYQiziWidget *obstacleQizi = qipan->getPositionQizi(curPos.x() + fuhao * i, curPos.y());
                 if (obstacleQizi != NULL)
                 {
                     return false;
                 }
             }
-            XYQiziWidget *obstacleQizi = XYQipanWidget::getInstance()
-                    ->getPositionQizi(row, column);
+            XYQiziWidget *obstacleQizi = qipan->getPositionQizi(row, column);
             if (obstacleQizi != NULL)
             {
                 if (obstacleQizi->type == HEI_JIANG
@@ -295,7 +292,7 @@ bool XYQiziWidget::isMovable(int row, int column)
     }
 
     // 同一方的棋子不能覆盖
-    XYQiziWidget *lastQizi = XYQipanWidget::getInstance()->getPositionQizi(row, column);
+    XYQiziWidget *lastQizi = qipan->getPositionQizi(row, column);
 
     if (lastQizi != NULL && (lastQizi->type <= HONG_JIANG && type <= HONG_JIANG
             || lastQizi->type > HONG_JIANG && type > HONG_JIANG))
@@ -352,7 +349,8 @@ void XYQiziWidget::mousePressEvent(QMouseEvent *event)
         mbLeftMousePressed = true;
         moLastPos = event->globalPos();
     }
-    XYQipanWidget::getInstance()->raiseTempQizi();
+    XYQipanWidget *qipan = qobject_cast<XYQipanWidget *>(parentWidget());
+    qipan->raiseTempQizi();
     raise();
 }
 
@@ -362,7 +360,8 @@ void XYQiziWidget::mouseReleaseEvent(QMouseEvent *event)
     {
         mbLeftMousePressed = false;
         moLastPos = event->globalPos();
-        XYQipanWidget::getInstance()->moveToNearestPos(this);
+        XYQipanWidget *qipan = qobject_cast<XYQipanWidget *>(parentWidget());
+        qipan->moveToNearestPos(this);
     }
 }
 
@@ -375,7 +374,8 @@ void XYQiziWidget::mouseMoveEvent(QMouseEvent *event)
         lastpos.setY( lastpos.y() + event->globalY() - moLastPos.y());
         move(lastpos);
         moLastPos = event->globalPos();
-        XYQipanWidget::getInstance()->showTempQizi(this);
+        XYQipanWidget *qipan = qobject_cast<XYQipanWidget *>(parentWidget());
+        qipan->showTempQizi(this);
     }
 }
 
@@ -488,12 +488,13 @@ void XYQiziWidget::setBeEaten(bool beEaten)
 
 void XYQiziWidget::resizeQizi(const QSize &size)
 {
-    static QPixmap qipan(":/xiangqi/qipan.png");
-    qreal ratio = 0.9 * size.width() / qipan.size().width();
+    static QPixmap qipan_pixmap(":/xiangqi/qipan.png");
+    qreal ratio = 0.85 * size.width() / qipan_pixmap.size().width();
     QPixmap qizi = getPixMapByType(type);
     resize(qizi.size() * ratio);
 
-    XYQipanWidget::getInstance()->putQizi(this, curPos.x(), curPos.y(), false);
+    XYQipanWidget *qipan = qobject_cast<XYQipanWidget *>(parentWidget());
+    qipan->putQizi(this, curPos.x(), curPos.y(), false);
 }
 
 void XYQiziWidget::eatQizi()
