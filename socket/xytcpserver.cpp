@@ -1,5 +1,6 @@
 ﻿#include "xytcpserver.h"
 #include "xyudpbroadcast.h"
+#include <QDataStream>
 
 XYTcpServer::XYTcpServer(QObject *parent)
     : QTcpServer(parent), port(45954)
