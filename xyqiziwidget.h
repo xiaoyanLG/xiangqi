@@ -24,10 +24,11 @@ public:
     // 判断位置棋子是否可以走
     bool isMovable(int row, int column);
 
-    QList<QPoint> getAllMovablePoints();
-
     // 获取棋子是哪一方的
     SIDETYPE getSideType();
+
+    // 获取棋子的顺序
+    int getIndex();
 
     void setType(TYPE type, int times);
     TYPE getType() const;
@@ -69,6 +70,7 @@ private:
     int     moveTimes;          // 记录该棋子在开局之后移动的次数
 
     friend class XYQipanWidget;
+    friend class XYQipanStatus;
     friend class XYQishou;
     friend class XYAIQishou;
 };

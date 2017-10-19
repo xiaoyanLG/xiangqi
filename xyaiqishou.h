@@ -32,10 +32,12 @@ private:
     XYQiziWidget          *lastQizi;    // 记录上一次移动的棋子
 
     // qint64 存放棋子的指针，list存放该棋子能移动的所有坐标
-    QMap<qint64, QList<QPoint> > hongLastMovablePoints;
-    QMap<qint64, QList<QPoint> > hongCurMovablePoints;
-    QMap<qint64, QList<QPoint> > heiLastMovablePoints;
-    QMap<qint64, QList<QPoint> > heiCurMovablePoints;
+    QMap<int, QList<QPoint> > hongLastMovablePoints;
+    QMap<int, QList<QPoint> > hongCurMovablePoints;
+    QMap<int, QList<QPoint> > heiLastMovablePoints;
+    QMap<int, QList<QPoint> > heiCurMovablePoints;
+
+    XYQipanStatus *lastQipanStatus;
 };
 
 #endif // XYAIQISHOU_H

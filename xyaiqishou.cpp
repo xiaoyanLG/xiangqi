@@ -15,7 +15,8 @@ XYAIQishou::XYAIQishou(QObject *parent)
     : QThread(parent),
       level(3),
       aiType(AUTO),
-      sideType(XYQiziWidget::UNKNOWN)
+      sideType(XYQiziWidget::UNKNOWN),
+      lastQipanStatus(NULL)
 {
 
 }
@@ -47,8 +48,16 @@ void XYAIQishou::setSideType(XYQiziWidget::SIDETYPE type)
 
 void XYAIQishou::qiziMoved(XYQiziWidget *qizi)
 {
-    hongCurMovablePoints = qipan->getCurQiziMovablePoints(XYQiziWidget::RED);
-    heiCurMovablePoints = qipan->getCurQiziMovablePoints(XYQiziWidget::BLACK);
-    qDebug() << (XYQiziWidget::TYPE)qizi->type << qizi->moveTimes << qipan->allMoveTimes;
+    XYQipanStatus *status = qipan->getCurQipanStatus();
+
+    if (lastQipanStatus != NULL)
+    {
+//        qDebug() << "--------------------------------------------------";
+//        qDebug() << QStringLiteral("红棋增加的点：") << status->getAddedPoints(lastQipanStatus, XYQiziWidget::RED);
+//        qDebug() << QStringLiteral("红棋减少的点：") << status->getReducedPoints(lastQipanStatus, XYQiziWidget::RED);
+//        qDebug() << QStringLiteral("黑棋增加的点：") << status->getAddedPoints(lastQipanStatus, XYQiziWidget::BLACK);
+//        qDebug() << QStringLiteral("黑棋减少的点：") << status->getReducedPoints(lastQipanStatus, XYQiziWidget::BLACK);
+    }
+    lastQipanStatus = status;
 }
 

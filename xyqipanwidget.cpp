@@ -23,6 +23,7 @@ XYQipanWidget *XYQipanWidget::getInstance()
 XYQipanWidget::XYQipanWidget(QWidget *parent)
     : QWidget(parent),
       tempQizi(NULL),
+      hong_jiang(NULL),
       lastSideType(XYQiziWidget::UNKNOWN),
       allMoveTimes(0)
 {
@@ -188,7 +189,7 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
     {
         XYQishou::getInstance()->sendQizi(
                     XYBattleInfoWidget::getInstance()->getSendHostAddress(),
-                    qizi, QPoint(row, column), false);
+                    qizi, QPoint(row, column), getQipanStatus(), false);
         putQizi(qizi, row, column, true);
         return;
     }
@@ -245,13 +246,15 @@ void XYQipanWidget::revokeLastQibu(bool socket)
             {
                 XYQishou::getInstance()->sendQizi(
                             XYBattleInfoWidget::getInstance()->getSendHostAddress(),
-                            last->target, last->curPos, true);
+                            last->target, last->curPos, getQipanStatus(), true);
             }
             revokeQizi(last->target, last->curPos.x(), last->curPos.y(), false);
 
             // 棋子移动次数减1
             last->target->moveTimes--;
             allMoveTimes--;
+
+            emit qiziMoved(last->target);
         }
         if (last->eatenQizi != NULL)
         {
@@ -262,9 +265,17 @@ void XYQipanWidget::revokeLastQibu(bool socket)
     }
 }
 
-XYQiziWidget *XYQipanWidget::findQizi(XYQiziWidget::TYPE type, int times, const QPoint &lastPoint, QPoint &movePoint)
+XYQiziWidget *XYQipanWidget::findQizi(const QByteArray &key,
+                                      XYQiziWidget::TYPE type,
+                                      int times,
+                                      const QPoint &lastPoint,
+                                      QPoint &movePoint)
 {
     XYQiziWidget *find = NULL;
+    if (key != getQipanStatus())
+    {
+        return find;
+    }
     for (int i = 0; i < hong_qizis.size(); ++i)
     {
         XYQiziWidget *qizi = hong_qizis.at(i);
@@ -310,15 +321,49 @@ XYQiziWidget *XYQipanWidget::findQizi(XYQiziWidget::TYPE type, int times, const 
     return find;
 }
 
-QMap<qint64, QList<QPoint> > XYQipanWidget::getCurQiziMovablePoints(XYQiziWidget::SIDETYPE type)
+QByteArray XYQipanWidget::getQipanStatus()
 {
-    QMap<qint64, QList<QPoint> > allPoints;
-
-    for (int i = 0; i < hong_qizis.size(); ++i)
+    QByteArray allPoints;
+    for (int row = 0; row < 10; ++row)
     {
-
+        for (int column = 0; column < 9; ++column)
+        {
+            if (qiziInqipan[row][column] == NULL)
+            {
+                allPoints.append((char)0);
+            }
+            else
+            {
+                allPoints.append(qiziInqipan[row][column]->getIndex());
+            }
+        }
     }
+
     return allPoints;
+}
+
+XYQipanStatus *XYQipanWidget::getCurQipanStatus()
+{
+    XYQipanStatus *status = new XYQipanStatus();
+
+    for (int row = 0; row < 10; ++row)
+    {
+        for (int column = 0; column < 9; ++column)
+        {
+            if (qiziInqipan[row][column] == NULL)
+            {
+                status->qipan[row][column] = XYQipanStatus::TYPE(0);
+            }
+            else
+            {
+                status->qipan[row][column] = XYQipanStatus::TYPE(qiziInqipan[row][column]->getIndex());
+            }
+        }
+    }
+
+    status->hongIsSmall = hong_jiang->defaultPos.x() < 5;
+
+    return status;
 }
 
 void XYQipanWidget::layoutQizi(bool keep)
@@ -529,6 +574,10 @@ void XYQipanWidget::initQizi()
         for (int j = 0; j < times; ++j)
         {
             XYQiziWidget *qizi = new XYQiziWidget(type, j, this);
+            if (type == XYQiziWidget::HONG_JIANG)
+            {
+                hong_jiang = qizi;
+            }
             hong_qizis.append(qizi);
             connect(this, SIGNAL(sizeChanged(QSize)), qizi, SLOT(resizeQizi(QSize)));
         }

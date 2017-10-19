@@ -38,14 +38,17 @@ public slots:
     void sendQizi(const QHostAddress &address,
                   XYQiziWidget *qizi,
                   const QPoint &point,
+                  const QByteArray &key,
                   bool revoked);
     void sendQiziWithUDP(const QHostAddress &address,
                          XYQiziWidget *qizi,
                          const QPoint &point,
+                         const QByteArray &key,
                          bool revoked);
     void sendQiziWithTCP(const QHostAddress &address,
                          XYQiziWidget *qizi,
                          const QPoint &point,
+                         const QByteArray &key,
                          bool revoked);
     void peopleResponse(QAbstractSocket::SocketState state);
 

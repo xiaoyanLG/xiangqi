@@ -108,15 +108,17 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
         QDataStream in(data);
         qint64 type,times;
         QPoint lastPoint, movePoint;
+        QByteArray key;
         bool revoked;
         in  >> type
             >> times
             >> lastPoint
             >> movePoint
+            >> key
             >> revoked;
         if (qipan != NULL)
         {
-            XYQiziWidget *qizi = qipan->findQizi((XYQiziWidget::TYPE)type, times, lastPoint, movePoint);
+            XYQiziWidget *qizi = qipan->findQizi(key, (XYQiziWidget::TYPE)type, times, lastPoint, movePoint);
             if (qizi != NULL)
             {
                 emit moveQizi(qizi, movePoint, revoked);
@@ -222,19 +224,27 @@ void XYQishou::sendMessage(const QHostAddress &address, const QString &msg)
     UDPSocket->writeUserDatagram(address, msg.toUtf8(), MSG);
 }
 
-void XYQishou::sendQizi(const QHostAddress &address, XYQiziWidget *qizi, const QPoint &point, bool revoked)
+void XYQishou::sendQizi(const QHostAddress &address,
+                        XYQiziWidget *qizi,
+                        const QPoint &point,
+                        const QByteArray &key,
+                        bool revoked)
 {
     if (TCPServer->isConnected())
     {
-        sendQiziWithTCP(address, qizi, point, revoked);
+        sendQiziWithTCP(address, qizi, point, key, revoked);
     }
     else
     {
-        sendQiziWithUDP(address, qizi, point, revoked);
+        sendQiziWithUDP(address, qizi, point, key, revoked);
     }
 }
 
-void XYQishou::sendQiziWithUDP(const QHostAddress &address, XYQiziWidget *qizi, const QPoint &point, bool revoked)
+void XYQishou::sendQiziWithUDP(const QHostAddress &address,
+                               XYQiziWidget *qizi,
+                               const QPoint &point,
+                               const QByteArray &key,
+                               bool revoked)
 {
     QByteArray qiziDatagram;
     QDataStream out(&qiziDatagram, QIODevice::WriteOnly);
@@ -243,12 +253,17 @@ void XYQishou::sendQiziWithUDP(const QHostAddress &address, XYQiziWidget *qizi, 
         << qint64(qizi->times)
         << qizi->curPos
         << point
+        << key
         << revoked;
 
     UDPSocket->writeUserDatagram(address, qiziDatagram, POINT);
 }
 
-void XYQishou::sendQiziWithTCP(const QHostAddress &address, XYQiziWidget *qizi, const QPoint &point, bool revoked)
+void XYQishou::sendQiziWithTCP(const QHostAddress &address,
+                               XYQiziWidget *qizi,
+                               const QPoint &point,
+                               const QByteArray &key,
+                               bool revoked)
 {
     QByteArray qiziDatagram;
     QDataStream out(&qiziDatagram, QIODevice::WriteOnly);
@@ -257,6 +272,7 @@ void XYQishou::sendQiziWithTCP(const QHostAddress &address, XYQiziWidget *qizi, 
         << qint64(qizi->times)
         << qizi->curPos
         << point
+        << key
         << revoked;
 
     UDPSocket->writeUserDatagram(address, qiziDatagram, POINT);

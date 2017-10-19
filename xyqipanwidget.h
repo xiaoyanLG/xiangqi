@@ -5,6 +5,7 @@
 #include <QStack>
 #include "xyqiziwidget.h"
 #include "xyqibu.h"
+#include "xyqipanstatus.h"
 
 class XYQipanWidget : public QWidget
 {
@@ -22,11 +23,14 @@ public:
     void raiseTempQizi();
     void showTempQizi(XYQiziWidget *qizi);
     void revokeLastQibu(bool socket = true);
-    XYQiziWidget *findQizi(XYQiziWidget::TYPE type,
+    XYQiziWidget *findQizi(const QByteArray &key,
+                           XYQiziWidget::TYPE type,
                            int times,
                            const QPoint &lastPoint,
                            QPoint &movePoint);
-    QMap<qint64, QList<QPoint> > getCurQiziMovablePoints(XYQiziWidget::SIDETYPE type);
+
+    QByteArray getQipanStatus();
+    XYQipanStatus *getCurQipanStatus();
 
 signals:
     void qiziMoved(XYQiziWidget *qizi);
@@ -49,6 +53,7 @@ private:
 
 private:
     static XYQipanWidget *instance;          // 棋盘单例
+    XYQiziWidget         *hong_jiang;        // 记录红将的句柄，容易查找
     QList<XYQiziWidget *> hong_qizis;        // 所有的红棋子
     QList<XYQiziWidget *> hei_qizis;         // 所有的黑棋子
     XYQiziWidget         *tempQizi;          // 临时棋子，阴影显示当前可移动的棋步
