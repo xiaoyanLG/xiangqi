@@ -31,13 +31,8 @@ private:
     AITYPE                 aiType;      // 记录AI类型（进攻型，防守型，全能型）
     XYQiziWidget          *lastQizi;    // 记录上一次移动的棋子
 
-    // qint64 存放棋子的指针，list存放该棋子能移动的所有坐标
-    QMap<int, QList<QPoint> > hongLastMovablePoints;
-    QMap<int, QList<QPoint> > hongCurMovablePoints;
-    QMap<int, QList<QPoint> > heiLastMovablePoints;
-    QMap<int, QList<QPoint> > heiCurMovablePoints;
-
-    XYQipanStatus *lastQipanStatus;
+    XYQipanStatus *lastQipanStatus;     // 记录上次的棋盘状态
+    QList<XYQipanStatus *> allStatus;   // 记录开局所走的所有的棋盘状态
 };
 
 #endif // XYAIQISHOU_H
