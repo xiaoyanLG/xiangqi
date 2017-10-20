@@ -1,8 +1,9 @@
 ﻿#include "xyqipanstatus.h"
+#include "xyaivalue.h"
 #include <QDebug>
 
-XYQipanStatus::XYQipanStatus()
-    :hongIsSmall(true)
+XYQipanStatus::XYQipanStatus(XYQipanWidget *qipanWidget)
+    :qipanWidget(qipanWidget), hongIsSmall(true)
 {
     memset(qipan, 0, sizeof(TYPE) * 9 * 10);
 }
@@ -71,9 +72,142 @@ void XYQipanStatus::switchViews()
     hongIsSmall = !hongIsSmall;
 }
 
+XYQiziWidget *XYQipanStatus::getQiziWithType(XYQipanStatus::TYPE type)
+{
+    if (type <= HONG_JIANG)
+    {
+        for (int i = 0; i < qipanWidget->hong_qizis.size(); ++i)
+        {
+            int index = qipanWidget->hong_qizis.at(i)->getIndex();
+            if (index == type)
+            {
+                return qipanWidget->hong_qizis.at(i);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < qipanWidget->hei_qizis.size(); ++i)
+        {
+            int index = qipanWidget->hei_qizis.at(i)->getIndex();
+            if (index == type)
+            {
+                return qipanWidget->hei_qizis.at(i);
+            }
+        }
+    }
+    return NULL;
+}
+
+int XYQipanStatus::getQiziAIValue(TYPE type, int row, int column, bool hong)
+{
+    // 总棋子值 = 基础值+机动性值+位置值
+    int totalValue = 0;
+
+    // 先确认是否已经查找过所有可以移动的点，如果没有就先查找
+    if (allHongMovablePoints.isEmpty())
+    {
+        getAllQiziMovablePoints(XYQiziWidget::RED);
+    }
+
+    // 计算当前是什么棋子
+    int qiziType[] = {5, 2, 2, 2, 2, 2, 1};
+    int temp_index = 0;
+    int cur_type = type % 16;
+    int real_type = 0;    // 最终转换后的棋子
+    while (real_type < 7 && cur_type != 0)
+    {
+        temp_index += qiziType[real_type];
+        if (temp_index >= cur_type)
+        {
+            break;
+        }
+        ++real_type;
+    }
+    if (type % 16 == 0)
+    {
+        real_type = 6;
+    }
+//    qDebug() << type << real_type;
+
+    // 先计算基础值
+    totalValue += XYAIBasicValues[real_type];
+    // 获取机动性值
+    if (hong)
+    {
+        QMap<TYPE, QList<QPoint> >::iterator findValue = allHongMovablePoints.find(type);
+        if (findValue != allHongMovablePoints.end())
+        {
+            totalValue += findValue.value().size()
+                    * XYAIMobilityValues[real_type];
+        }
+    }
+    else
+    {
+        QMap<TYPE, QList<QPoint> >::iterator findValue = allHeiMovablePoints.find(type);
+        if (findValue != allHeiMovablePoints.end())
+        {
+            totalValue += findValue.value().size()
+                    * XYAIMobilityValues[real_type];
+        }
+    }
+
+    // 获取位置值
+    if (hong)
+    {
+        if (hongIsSmall)
+        {
+            totalValue += XYAIPositionValues[real_type][row][column];
+        }
+        else
+        {
+            QPoint switchPoint = XYQiziWidget::getSwitchViewsPos(QPoint(row, column));
+            totalValue += XYAIPositionValues[real_type][switchPoint.x()][switchPoint.y()];
+        }
+    }
+    else
+    {
+        if (hongIsSmall)
+        {
+            QPoint switchPoint = XYQiziWidget::getSwitchViewsPos(QPoint(row, column));
+            totalValue += XYAIPositionValues[real_type][switchPoint.x()][switchPoint.y()];
+        }
+        else
+        {
+            totalValue += XYAIPositionValues[real_type][row][column];
+        }
+    }
+
+
+//    qDebug() << totalValue;
+    return totalValue;
+}
+
+void XYQipanStatus::getTotalAIValueOfStatus(int &hong, int &hei)
+{
+    hong = 0;
+    hei = 0;
+    for (int row = 0; row < 10; ++row)
+    {
+        for (int column = 0; column < 9; ++column)
+        {
+            TYPE curType = qipan[row][column];
+            if (curType >= HONG_ZU1
+                        && curType <= HONG_JIANG)
+            {
+                hong += getQiziAIValue(curType, row, column, true);
+            }
+            else if (curType != TYPE(0))
+            {
+                hei += getQiziAIValue(curType, row, column, false);
+            }
+        }
+    }
+}
+
 XYQipanStatus *XYQipanStatus::moveQizi(XYQipanStatus::TYPE qizi, int r, int c)
 {
-    XYQipanStatus *temp = new XYQipanStatus();
+    XYQipanStatus *temp = new XYQipanStatus(qipanWidget);
     temp->hongIsSmall = hongIsSmall;
     memcpy(temp->qipan, qipan, sizeof(TYPE) * 9 * 10);
     for (int row = 0; row < 10; ++row)
@@ -90,7 +224,7 @@ XYQipanStatus *XYQipanStatus::moveQizi(XYQipanStatus::TYPE qizi, int r, int c)
     return temp;
 }
 
-QMap<int, QList<QPoint> > XYQipanStatus::getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type)
+const QMap<XYQipanStatus::TYPE, QList<QPoint> > &XYQipanStatus::getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type)
 {
     if (type == XYQiziWidget::RED && !allHongMovablePoints.isEmpty())
     {
@@ -619,14 +753,14 @@ QList<QPoint> XYQipanStatus::getQiziMovablePoints(TYPE type, int row, int column
     return allPoints;
 }
 
-QMap<int, QList<QPoint> > XYQipanStatus::getAddedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type)
+QMap<XYQipanStatus::TYPE, QList<QPoint> > XYQipanStatus::getAddedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type)
 {
-    QMap<int, QList<QPoint> > addedPoints;
-    QMap<int, QList<QPoint> > thisPoints = this->getAllQiziMovablePoints(type);
-    QMap<int, QList<QPoint> > otherPoints = other->getAllQiziMovablePoints(type);
+    QMap<TYPE, QList<QPoint> > addedPoints;
+    QMap<TYPE, QList<QPoint> > thisPoints = this->getAllQiziMovablePoints(type);
+    QMap<TYPE, QList<QPoint> > otherPoints = other->getAllQiziMovablePoints(type);
 
-    QMap<int, QList<QPoint> >::iterator it = thisPoints.begin();
-    QMap<int, QList<QPoint> >::iterator find;
+    QMap<TYPE, QList<QPoint> >::iterator it = thisPoints.begin();
+    QMap<TYPE, QList<QPoint> >::iterator find;
     while (it != thisPoints.end())
     {
         find = otherPoints.find(it.key());
@@ -658,14 +792,14 @@ QMap<int, QList<QPoint> > XYQipanStatus::getAddedPoints(XYQipanStatus *other, XY
     return addedPoints;
 }
 
-QMap<int, QList<QPoint> > XYQipanStatus::getReducedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type)
+QMap<XYQipanStatus::TYPE, QList<QPoint> > XYQipanStatus::getReducedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type)
 {
-    QMap<int, QList<QPoint> > reducedPoints;
-    QMap<int, QList<QPoint> > thisPoints = this->getAllQiziMovablePoints(type);
-    QMap<int, QList<QPoint> > otherPoints = other->getAllQiziMovablePoints(type);
+    QMap<TYPE, QList<QPoint> > reducedPoints;
+    QMap<TYPE, QList<QPoint> > thisPoints = this->getAllQiziMovablePoints(type);
+    QMap<TYPE, QList<QPoint> > otherPoints = other->getAllQiziMovablePoints(type);
 
-    QMap<int, QList<QPoint> >::iterator it = otherPoints.begin();
-    QMap<int, QList<QPoint> >::iterator find;
+    QMap<TYPE, QList<QPoint> >::iterator it = otherPoints.begin();
+    QMap<TYPE, QList<QPoint> >::iterator find;
     while (it != otherPoints.end())
     {
         find = thisPoints.find(it.key());

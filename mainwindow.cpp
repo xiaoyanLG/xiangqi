@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ai->setQipan(ui->widget);
     connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
             ai, SLOT(qiziMoved(XYQiziWidget*)));
+    connect(ai, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool)),
+            ui->widget, SLOT(moveQizi(XYQiziWidget*,QPoint,bool)));
 
     connect(me, SIGNAL(peopleUpline(QString,QHostAddress)),
             ui->widget_2, SLOT(peopleUpline(QString,QHostAddress)));
@@ -121,6 +123,7 @@ void MainWindow::testsssss()
 void MainWindow::layoutQizi(bool keep)
 {
     ui->widget->layoutQizi(keep);
+    ai->clear();
 }
 
 void MainWindow::switchViews()

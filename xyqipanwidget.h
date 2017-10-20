@@ -65,6 +65,7 @@ private:
 
     XYQiziWidget::SIDETYPE lastSideType;     // 记录上次下棋的棋方
 
+    friend class XYQipanStatus;
     friend class XYQishou;
     friend class XYAIQishou;
 };

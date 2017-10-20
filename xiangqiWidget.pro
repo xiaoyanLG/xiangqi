@@ -60,7 +60,8 @@ HEADERS  += mainwindow.h \
     chineseInput/xytranslatemodel.h \
     chineseInput/xytranslateview.h \
     xyaiqishou.h \
-    xyqipanstatus.h
+    xyqipanstatus.h \
+    xyaivalue.h
 
 FORMS    += mainwindow.ui
 

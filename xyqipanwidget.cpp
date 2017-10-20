@@ -344,7 +344,7 @@ QByteArray XYQipanWidget::getQipanStatus()
 
 XYQipanStatus *XYQipanWidget::getCurQipanStatus()
 {
-    XYQipanStatus *status = new XYQipanStatus();
+    XYQipanStatus *status = new XYQipanStatus(this);
 
     for (int row = 0; row < 10; ++row)
     {

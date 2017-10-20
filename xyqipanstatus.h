@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMap>
 #include "xyqiziwidget.h"
+#include "xyqipanwidget.h"
 
 class XYQipanStatus
 {
@@ -16,24 +17,28 @@ public:
               HEI_PAO1, HEI_PAO2, HEI_CHE1, HEI_CHE2, HEI_MA1, HEI_MA2,
               HEI_XIANG1, HEI_XIANG2, HEI_SI1, HEI_SI2, HEI_JIANG = 32};
 
-    explicit XYQipanStatus();
+    explicit XYQipanStatus(XYQipanWidget *qipanWidget);
     ~XYQipanStatus();
     bool isOver();
     void switchViews();
+    XYQiziWidget *getQiziWithType(TYPE type);
+    int getQiziAIValue(TYPE type, int row, int column, bool hong);
+    void getTotalAIValueOfStatus(int &hong, int &hei);
 
     XYQipanStatus *moveQizi(TYPE qizi, int r, int c);
-    QMap<int, QList<QPoint> > getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type);
+    const QMap<TYPE, QList<QPoint> > &getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type);
     QList<QPoint> getQiziMovablePoints(TYPE type) const;
     QList<QPoint> getQiziMovablePoints(TYPE type, int row, int column) const;
 
-    QMap<int, QList<QPoint> > getAddedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type);
-    QMap<int, QList<QPoint> > getReducedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type);
+    QMap<TYPE, QList<QPoint> > getAddedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type);
+    QMap<TYPE, QList<QPoint> > getReducedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type);
 
     TYPE qipan[10][9];
     bool hongIsSmall;
+    XYQipanWidget *qipanWidget;   // 记录当前棋盘状态所属的棋盘
 
-    QMap<int, QList<QPoint> > allHongMovablePoints;
-    QMap<int, QList<QPoint> > allHeiMovablePoints;
+    QMap<TYPE, QList<QPoint> > allHongMovablePoints;
+    QMap<TYPE, QList<QPoint> > allHeiMovablePoints;
 };
 
 #endif // XYQIPANSTATUS_H
