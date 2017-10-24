@@ -80,13 +80,23 @@ void XYAIQishou::qiziMoved(const QPoint &src, const QPoint &tar, XYQiziWidget *q
 {
     if (XYQishou::getInstance()->getSideType() == qizi->getSideType())
     {
-        bool win = wushiMoveQizi(src);
+        bool win = false;
+        if (qizi->defaultPos.x() < 5)
+        {
+            win = wushiMoveQizi(XYQiziWidget::getSwitchViewsPos(src));
+            targetPoint = XYQiziWidget::getSwitchViewsPos(tar);
+        }
+        else
+        {
+            win = wushiMoveQizi(src);
+            targetPoint = tar;
+        }
         if (win)
         {
             emit isWin(true);
             return;
         }
-        targetPoint = tar;
+        curMovedQizi = qizi;
         start();
     }
 }
@@ -188,7 +198,14 @@ void XYAIQishou::run()
     QPoint src, tar;
     bool win = getPos(src, tar);
 
+    if (curMovedQizi->defaultPos.x() < 5)
+    {
+        src = XYQiziWidget::getSwitchViewsPos(src);
+        tar = XYQiziWidget::getSwitchViewsPos(tar);
+    }
+
     XYQiziWidget *qizi = qipan->findQizi(src);
+
     if (qizi != NULL)
     {
         emit moveQizi(qizi, tar, false);
