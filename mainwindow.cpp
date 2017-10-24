@@ -5,7 +5,10 @@
 #include <QApplication>
 #include <QLabel>
 #include <QTimer>
+#include <QMessageBox>
 #include <QDebug>
+
+#include "wushi.h"
 
 MainWindow *MainWindow::instance;
 MainWindow *MainWindow::getInstance()
@@ -31,8 +34,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ai = new XYAIQishou(this);
     ai->setQipan(ui->widget);
-    connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
-            ai, SLOT(qiziMoved(XYQiziWidget*)));
+//    connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
+//            ai, SLOT(qiziMoved(XYQiziWidget*)));
+    connect(ai, SIGNAL(isWin(bool)), this, SLOT(isWin(bool)));
+    connect(ui->widget, SIGNAL(qiziMoved(QPoint, QPoint,XYQiziWidget*)),
+            ai, SLOT(qiziMoved(QPoint, QPoint,XYQiziWidget*)));
     connect(ai, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool)),
             ui->widget, SLOT(moveQizi(XYQiziWidget*,QPoint,bool)));
 
@@ -98,6 +104,20 @@ void MainWindow::showMessage(const QString &msg, int times)
     msgLabel->move(0, (height() - msgLabel->height()) / 2);
 }
 
+void MainWindow::isWin(bool win)
+{
+    if (win)
+    {
+        QMessageBox::information(this, QString::fromStdWString(L"恭喜"),
+                                 QString::fromStdWString(L"祝贺你取得胜利！"));
+    }
+    else
+    {
+        QMessageBox::information(this, QString::fromStdWString(L"尴尬"),
+                                 QString::fromStdWString(L"请再接再厉！"));
+    }
+}
+
 void MainWindow::testsssss()
 {
 //    static int x = 0;
@@ -124,6 +144,7 @@ void MainWindow::layoutQizi(bool keep)
 {
     ui->widget->layoutQizi(keep);
     ai->clear();
+    Startup();
 }
 
 void MainWindow::switchViews()

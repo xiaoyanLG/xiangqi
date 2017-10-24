@@ -36,6 +36,7 @@ public:
     void clear();
 
 signals:
+    void isWin(bool win);
     void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked = false);
 
 public slots:
@@ -44,8 +45,10 @@ public slots:
     void setSideType(XYQiziWidget::SIDETYPE type);
     void qiziMoved(XYQiziWidget *qizi);
 
+    // 象棋巫师接口
+    void qiziMoved(const QPoint &src, const QPoint &tar, XYQiziWidget *qizi);
+
 protected:
-    int getMinValue(XYQipanStatus *qipanStatus, XYQiziWidget::SIDETYPE type, int &count);
     void getValues(int level,
                    XYQiziWidget::SIDETYPE type,
                    QList<MOVESTATUS *> &allBestPoints,
@@ -65,6 +68,8 @@ private:
     XYQipanStatus *curQipanStatus;      // 记录当前的棋盘状态
     XYQipanStatus *lastQipanStatus;     // 记录上次的棋盘状态
     QList<XYQipanStatus *> allStatus;   // 记录开局所走的所有的棋盘状态
+
+    QPoint         targetPoint;         // 象棋巫师作为AI
 };
 
 #endif // XYAIQISHOU_H

@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     chineseInput/xytranslatemodel.cpp \
     chineseInput/xytranslateview.cpp \
     xyaiqishou.cpp \
-    xyqipanstatus.cpp
+    xyqipanstatus.cpp \
+    wushi.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
@@ -61,11 +62,15 @@ HEADERS  += mainwindow.h \
     chineseInput/xytranslateview.h \
     xyaiqishou.h \
     xyqipanstatus.h \
-    xyaivalue.h
+    xyaivalue.h \
+    wushi.h
 
 FORMS    += mainwindow.ui
 
 RESOURCES += \
-    images/images.qrc
+    images/images.qrc \
+    db/db.qrc
 
 RC_FILE = ico.rc
+
+DISTFILES +=

@@ -23,6 +23,7 @@ public:
     void raiseTempQizi();
     void showTempQizi(XYQiziWidget *qizi);
     void revokeLastQibu(bool socket = true);
+    XYQiziWidget *findQizi(const QPoint &point);
     XYQiziWidget *findQizi(const QByteArray &key,
                            XYQiziWidget::TYPE type,
                            int times,
@@ -34,6 +35,7 @@ public:
 
 signals:
     void qiziMoved(XYQiziWidget *qizi);
+    void qiziMoved(const QPoint &src, const QPoint &tar, XYQiziWidget *qizi);
     void sizeChanged(const QSize &size);
     void showMessages(const QString &msg);
 

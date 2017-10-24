@@ -36,7 +36,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
 int main(int argc, char *argv[])
 {
-//    qInstallMessageHandler(myMessageOutput); //安装LOG
+    qInstallMessageHandler(myMessageOutput); //安装LOG
 
     QApplication a(argc, argv);
     XYInput::getInstance()->initInputBase(QApplication::applicationDirPath() + "/chineseBase/chinese.db");

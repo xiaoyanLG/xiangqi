@@ -224,7 +224,7 @@ XYQipanStatus *XYQipanStatus::moveQizi(XYQipanStatus::TYPE qizi, int r, int c)
     return temp;
 }
 
-const QMap<XYQipanStatus::TYPE, QList<QPoint> > &XYQipanStatus::getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type)
+QMap<XYQipanStatus::TYPE, QList<QPoint> > &XYQipanStatus::getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type)
 {
     if (type == XYQiziWidget::RED && !allHongMovablePoints.isEmpty())
     {
@@ -261,7 +261,7 @@ const QMap<XYQipanStatus::TYPE, QList<QPoint> > &XYQipanStatus::getAllQiziMovabl
     }
 }
 
-QList<QPoint> XYQipanStatus::getQiziMovablePoints(XYQipanStatus::TYPE type) const
+QList<QPoint> XYQipanStatus::getQiziMovablePoints(XYQipanStatus::TYPE type)
 {
     QList<QPoint> allPoints;
     for (int row = 0; row < 10; ++row)
@@ -279,7 +279,7 @@ QList<QPoint> XYQipanStatus::getQiziMovablePoints(XYQipanStatus::TYPE type) cons
     return allPoints;
 }
 
-QList<QPoint> XYQipanStatus::getQiziMovablePoints(TYPE type, int row, int column) const
+QList<QPoint> XYQipanStatus::getQiziMovablePoints(TYPE type, int row, int column)
 {
     QList<QPoint> allPoints;
 
@@ -326,13 +326,13 @@ QList<QPoint> XYQipanStatus::getQiziMovablePoints(TYPE type, int row, int column
         {
             if (row >= 5)
             {
-                allPoints.append(QPoint(row + 1, column));
+                allPoints.append(QPoint(row - 1, column));
             }
             else
             {
                 allPoints.append(QPoint(row, column + 1));
                 allPoints.append(QPoint(row, column - 1));
-                allPoints.append(QPoint(row + 1, column));
+                allPoints.append(QPoint(row - 1, column));
             }
         }
         else
@@ -341,11 +341,11 @@ QList<QPoint> XYQipanStatus::getQiziMovablePoints(TYPE type, int row, int column
             {
                 allPoints.append(QPoint(row, column + 1));
                 allPoints.append(QPoint(row, column - 1));
-                allPoints.append(QPoint(row - 1, column));
+                allPoints.append(QPoint(row + 1, column));
             }
             else
             {
-                allPoints.append(QPoint(row - 1, column));
+                allPoints.append(QPoint(row + 1, column));
             }
         }
         break;
@@ -738,14 +738,24 @@ QList<QPoint> XYQipanStatus::getQiziMovablePoints(TYPE type, int row, int column
         // 去掉是己方棋子的位置
         if (qipan[(*it).x()][(*it).y()] != 0)
         {
-            if ((qipan[(*it).x()][(*it).y()] <= HONG_JIANG
-                    && type <= HONG_JIANG)
-                    || (qipan[(*it).x()][(*it).y()] > HONG_JIANG
-                        && type > HONG_JIANG))
+//            if ((qipan[(*it).x()][(*it).y()] <= HONG_JIANG
+//                    && type <= HONG_JIANG)
+//                    || (qipan[(*it).x()][(*it).y()] > HONG_JIANG
+//                        && type > HONG_JIANG))
+//            {
+//                it = allPoints.erase(it);
+//                continue;
+//            }
+            if (type <= HONG_JIANG && qipan[(*it).x()][(*it).y()] > HONG_JIANG)
             {
-                it = allPoints.erase(it);
-                continue;
+                allHongEatenPoints.insert(qipan[(*it).x()][(*it).y()], (*it));
             }
+            else if (type > HONG_JIANG && qipan[(*it).x()][(*it).y()] <= HONG_JIANG)
+            {
+                allHeiEatenPoints.insert(qipan[(*it).x()][(*it).y()], (*it));
+            }
+            it = allPoints.erase(it);
+            continue;
         }
         ++it;
     }

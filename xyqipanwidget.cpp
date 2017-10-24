@@ -127,6 +127,7 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHis
         allMoveTimes++;
 
         emit qiziMoved(qizi);
+        emit qiziMoved(lastPos, qizi->curPos, qizi);
     }
 }
 
@@ -242,6 +243,7 @@ void XYQipanWidget::revokeLastQibu(bool socket)
         XYQibu *last = historyQibus.pop();
         if (last->target != NULL)
         {
+            QPoint lastPos = last->target->curPos;
             if (socket)
             {
                 XYQishou::getInstance()->sendQizi(
@@ -255,6 +257,7 @@ void XYQipanWidget::revokeLastQibu(bool socket)
             allMoveTimes--;
 
             emit qiziMoved(last->target);
+            emit qiziMoved(lastPos, last->curPos, last->target);
         }
         if (last->eatenQizi != NULL)
         {
@@ -263,6 +266,22 @@ void XYQipanWidget::revokeLastQibu(bool socket)
         }
         delete last;
     }
+}
+
+XYQiziWidget *XYQipanWidget::findQizi(const QPoint &point)
+{
+    for (int row = 0; row < 10; ++row)
+    {
+        for (int column = 0; column < 9; ++column)
+        {
+            if (point.x() == row && point.y() == column)
+            {
+                return qiziInqipan[row][column];
+            }
+        }
+    }
+
+    return NULL;
 }
 
 XYQiziWidget *XYQipanWidget::findQizi(const QByteArray &key,

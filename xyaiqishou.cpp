@@ -1,6 +1,7 @@
 ﻿#include "xyaiqishou.h"
 #include "xyqishou.h"
 #include <QDebug>
+#include "wushi.h"
 
 XYAIQishou *XYAIQishou::instance = NULL;
 XYAIQishou *XYAIQishou::getInstance()
@@ -75,49 +76,19 @@ void XYAIQishou::qiziMoved(XYQiziWidget *qizi)
     }
 }
 
-int XYAIQishou::getMinValue(XYQipanStatus *qipanStatus, XYQiziWidget::SIDETYPE type, int &count)
+void XYAIQishou::qiziMoved(const QPoint &src, const QPoint &tar, XYQiziWidget *qizi)
 {
-    const QMap<XYQipanStatus::TYPE, QList<QPoint> > &allPoints
-            = qipanStatus->getAllQiziMovablePoints(type);
-
-
-    int hong_value = 0;
-    int hei_value = 0;
-    QMap<XYQipanStatus::TYPE, QList<QPoint> >::const_iterator it = allPoints.begin();
-    int minValue = 200000;
-    while (it != allPoints.end())
+    if (XYQishou::getInstance()->getSideType() == qizi->getSideType())
     {
-        const QList<QPoint> &movablePoints = it.value();
-        for (int i = 0; i < movablePoints.size(); ++i)
+        bool win = wushiMoveQizi(src);
+        if (win)
         {
-            count++;
-            XYQipanStatus *tempStatus = qipanStatus->moveQizi((XYQipanStatus::TYPE)it.key(),
-                                                                 movablePoints.at(i).x(),
-                                                                 movablePoints.at(i).y());
-            tempStatus->getTotalAIValueOfStatus(hong_value, hei_value);
-
-            if (type == XYQiziWidget::RED)
-            {
-                int cur_value = hong_value;
-                if (cur_value < minValue)
-                {
-                    minValue = cur_value;
-                }
-            }
-            else
-            {
-                int cur_value = hei_value - hong_value;
-                if (cur_value < minValue)
-                {
-                    minValue = cur_value;
-                }
-            }
-            delete tempStatus;
+            emit isWin(true);
+            return;
         }
-        ++it;
+        targetPoint = tar;
+        start();
     }
-
-    return minValue;
 }
 
 void XYAIQishou::getValues(int level,
@@ -130,19 +101,18 @@ void XYAIQishou::getValues(int level,
         return;
     }
     QList<MOVESTATUS *> curAllBestPoints;
-    int hong_value = 0;
-    int hei_value = 0;
 
     for (int i = 0; i < allBestPoints.size(); ++i)
     {
         XYQipanStatus *temp_curQipanStatus = allBestPoints.at(i)->qipanStatus;
         QPoint temp_point = allBestPoints.at(i)->point;
-        int temp_value = allBestPoints.at(i)->value;
         XYQipanStatus::TYPE temp_type = allBestPoints.at(i)->type;
         const QMap<XYQipanStatus::TYPE, QList<QPoint> > &allPoints
                 = temp_curQipanStatus->getAllQiziMovablePoints(type);
 
 
+        int hong_value = 0;
+        int hei_value = 0;
         QMap<XYQipanStatus::TYPE, QList<QPoint> >::const_iterator it = allPoints.begin();
 
         while (it != allPoints.end())
@@ -154,11 +124,11 @@ void XYAIQishou::getValues(int level,
                 XYQipanStatus *tempStatus = temp_curQipanStatus->moveQizi((XYQipanStatus::TYPE)it.key(),
                                                                      movablePoints.at(j).x(),
                                                                      movablePoints.at(j).y());
-                tempStatus->getTotalAIValueOfStatus(hong_value, hei_value);
 
+                tempStatus->getTotalAIValueOfStatus(hong_value, hei_value);
                 if (type == XYQiziWidget::RED)
                 {
-                    int cur_value = hong_value + temp_value;
+                    int cur_value = hong_value - hei_value;
 
                     MOVESTATUS *thisIsMax = NULL;
                     if (root)
@@ -179,7 +149,7 @@ void XYAIQishou::getValues(int level,
                 }
                 else
                 {
-                    int cur_value = hei_value + temp_value;
+                    int cur_value = hei_value - hong_value;
                     MOVESTATUS *thisIsMax = NULL;
                     if (root)
                     {
@@ -214,35 +184,20 @@ void XYAIQishou::getValues(int level,
 
 void XYAIQishou::run()
 {
-    XYQiziWidget::SIDETYPE type = XYQiziWidget::RED;
-    if (curMovedQizi->getSideType() == XYQiziWidget::RED)
+    wushiMoveQizi(targetPoint);
+    QPoint src, tar;
+    bool win = getPos(src, tar);
+
+    XYQiziWidget *qizi = qipan->findQizi(src);
+    if (qizi != NULL)
     {
-        type = XYQiziWidget::BLACK;
+        emit moveQizi(qizi, tar, false);
     }
 
-    QList<MOVESTATUS *> allBestPoints;
-    allBestPoints.append(new MOVESTATUS(QPoint(), (XYQipanStatus::TYPE)0, curQipanStatus, 0));
-
-    int count = 0;
-    getValues(2, type, allBestPoints, true, count);
-
-    int maxValue = 0;
-    MOVESTATUS *maxStatus = NULL;
-    for (int i = 0; i < allBestPoints.size(); ++i)
+    if (win)
     {
-        if (maxValue < allBestPoints.at(i)->value)
-        {
-            maxStatus = allBestPoints.at(i);
-        }
+        emit isWin(false);
+        return;
     }
-    if (!allBestPoints.isEmpty())
-    {
-        XYQiziWidget *qizi = curQipanStatus->getQiziWithType(maxStatus->type);
-        if (qizi != NULL)
-        {
-            emit moveQizi(qizi, maxStatus->point);
-        }
-    }
-    qDeleteAll(allBestPoints);
 }
 

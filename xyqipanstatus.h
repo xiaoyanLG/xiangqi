@@ -26,9 +26,9 @@ public:
     void getTotalAIValueOfStatus(int &hong, int &hei);
 
     XYQipanStatus *moveQizi(TYPE qizi, int r, int c);
-    const QMap<TYPE, QList<QPoint> > &getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type);
-    QList<QPoint> getQiziMovablePoints(TYPE type) const;
-    QList<QPoint> getQiziMovablePoints(TYPE type, int row, int column) const;
+    QMap<TYPE, QList<QPoint> > &getAllQiziMovablePoints(XYQiziWidget::SIDETYPE type);
+    QList<QPoint> getQiziMovablePoints(TYPE type);
+    QList<QPoint> getQiziMovablePoints(TYPE type, int row, int column);
 
     QMap<TYPE, QList<QPoint> > getAddedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type);
     QMap<TYPE, QList<QPoint> > getReducedPoints(XYQipanStatus *other, XYQiziWidget::SIDETYPE type);
@@ -39,6 +39,8 @@ public:
 
     QMap<TYPE, QList<QPoint> > allHongMovablePoints;
     QMap<TYPE, QList<QPoint> > allHeiMovablePoints;
+    QMap<TYPE, QPoint > allHongEatenPoints;
+    QMap<TYPE, QPoint > allHeiEatenPoints;
 };
 
 #endif // XYQIPANSTATUS_H

@@ -22,6 +22,7 @@ public slots:
     void layoutQizi(bool keep = false);
     void switchViews();
     void showMessage(const QString &msg, int times = 3000);
+    void isWin(bool win);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
