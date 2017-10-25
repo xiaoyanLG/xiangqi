@@ -15,7 +15,7 @@ public:
     void abort();
 
 signals:
-    void receiveUserData(const QString &from, const QByteArray &data, int type);
+    void receiveUserData(const QString &from, const QByteArray &data, int type, bool udp = false);
     void stateChanged(QAbstractSocket::SocketState state);
 
 public slots:

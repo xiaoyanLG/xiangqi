@@ -34,13 +34,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ai = new XYAIQishou(this);
     ai->setQipan(ui->widget);
-//    connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
-//            ai, SLOT(qiziMoved(XYQiziWidget*)));
+    connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
+            ai, SLOT(qiziMoved(XYQiziWidget*)));
     connect(ai, SIGNAL(isWin(bool)), this, SLOT(isWin(bool)));
-    connect(ui->widget, SIGNAL(qiziMoved(QPoint, QPoint,XYQiziWidget*)),
-            ai, SLOT(qiziMoved(QPoint, QPoint,XYQiziWidget*)));
-    connect(ai, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool)),
-            ui->widget, SLOT(moveQizi(XYQiziWidget*,QPoint,bool)));
+//    connect(ui->widget, SIGNAL(qiziMoved(QPoint, QPoint,XYQiziWidget*,bool)),
+//            ai, SLOT(qiziMoved(QPoint, QPoint,XYQiziWidget*,bool)));
+    connect(ai, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool,bool)),
+            ui->widget, SLOT(moveQizi(XYQiziWidget*,QPoint,bool,bool)));
 
     connect(me, SIGNAL(peopleUpline(QString,QHostAddress)),
             ui->widget_2, SLOT(peopleUpline(QString,QHostAddress)));
@@ -50,8 +50,10 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->widget_2, SLOT(receiveData(QString,QString)));
     connect(me, SIGNAL(sideChanged()),
             ui->widget_2, SLOT(qishouSideChanged()));
-    connect(me, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool)), ui->widget,
-            SLOT(moveQizi(XYQiziWidget*,QPoint,bool)));
+    connect(me, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool,bool)), ui->widget,
+            SLOT(moveQizi(XYQiziWidget*,QPoint,bool,bool)));
+    connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
+            me, SLOT(qiziMoved(XYQiziWidget*)));
 
     connect(ui->widget_2, SIGNAL(sendMessage(QHostAddress,QString)),
             me, SLOT(sendMessage(QHostAddress,QString)));

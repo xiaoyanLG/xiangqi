@@ -1220,7 +1220,7 @@ static int ProbeHash(int vlAlpha, int vlBeta, int nDepth, int &mv) {
     return hsh.svl;
   }
   return -MATE_VALUE;
-};
+}
 
 // 保存置换表项
 static void RecordHash(int nFlag, int vl, int nDepth, int mv) {
@@ -1248,7 +1248,7 @@ static void RecordHash(int nFlag, int vl, int nDepth, int mv) {
   hsh.dwLock0 = pos.zobr.dwLock0;
   hsh.dwLock1 = pos.zobr.dwLock1;
   Search.HashTable[pos.zobr.dwKey & (HASH_SIZE - 1)] = hsh;
-};
+}
 
 // MVV/LVA每种子力的价值
 static BYTE cucMvvLva[24] = {
@@ -1997,6 +1997,7 @@ void Startup(void) {
 //}
 
 // 自定义函数
+// 个人移动（连续调用两次，第一次选择棋子，第二次移动选择的棋子）
 bool wushiMoveQizi(const QPoint &tar)
 {
     int x = FILE_LEFT + tar.y();
@@ -2005,7 +2006,7 @@ bool wushiMoveQizi(const QPoint &tar)
     return ClickSquare(COORD_XY(x, y));
 }
 
-
+// 获取当前AI移动的点（必须在调该函数的时候AI先走一步）
 bool getPos(QPoint &src, QPoint &tar)
 {
     int sqSrc, sqDst, mv;
@@ -2020,4 +2021,39 @@ bool getPos(QPoint &src, QPoint &tar)
     tar.setY(FILE_X(sqDst) - FILE_LEFT);
 
     return pos.IsMate();
+}
+
+// 交换棋子 （传入参数是AI现在选择的棋子）
+void changeSide(int red)
+{
+    if (red == pos.sdPlayer)
+    {
+        ResponseMove(); // 电脑走一棋
+    }
+}
+
+// AI走接下来的一步
+void AIMove(void)
+{
+    ResponseMove(); // 电脑走一棋
+}
+
+// 自定义棋盘
+void InitWithXYQipan(int *qipan, int aiSide)
+{
+    // 初始化全局变量
+    Xqwl.bFlipped = FALSE;
+    Xqwl.sqSelected = Xqwl.mvLast = 0;
+    Xqwl.bGameOver = FALSE;
+
+    int sq, pc;
+    pos.ClearBoard();
+    pos.sdPlayer = aiSide;
+    for (sq = 0; sq < 256; sq ++) {
+      pc = qipan[sq];
+      if (pc != 0) {
+        pos.AddPiece(sq, pc);
+      }
+    }
+    pos.SetIrrev();
 }

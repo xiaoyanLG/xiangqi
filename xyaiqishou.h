@@ -28,25 +28,26 @@ class XYAIQishou : public QThread
 {
     Q_OBJECT
 public:
+    enum STARTTYPE{HOSTINGMOVE, AIMOVE};
     enum AITYPE{ATTACK, GUARD, AUTO};
     static XYAIQishou *getInstance();
     explicit XYAIQishou(QObject *parent = 0);
     ~XYAIQishou();
     void setQipan(XYQipanWidget *qipan);
     void clear();
+    bool isAIStart();
+    void start(STARTTYPE type, QVariant value = QVariant());
 
 signals:
     void isWin(bool win);
-    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked = false);
+    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked = false, bool socket = true);
 
 public slots:
+    void switchAI();
     void setLevel(int level);
     void setAiType(AITYPE type);
     void setSideType(XYQiziWidget::SIDETYPE type);
     void qiziMoved(XYQiziWidget *qizi);
-
-    // 象棋巫师接口
-    void qiziMoved(const QPoint &src, const QPoint &tar, XYQiziWidget *qizi);
 
 protected:
     void getValues(int level,
@@ -58,6 +59,8 @@ protected:
 private:
     static XYAIQishou     *instance;
     XYQipanWidget         *qipan;
+    bool                   AISwitch;     // 启用AI
+    STARTTYPE              type;        // 记录当前启动线程类型
     int                    level;       // 记录AI技术水平
     XYQiziWidget::SIDETYPE sideType;    // 记录AI走哪一方
     AITYPE                 aiType;      // 记录AI类型（进攻型，防守型，全能型）

@@ -52,7 +52,7 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     QPushButton *ZoomOutBtn = new QPushButton(QString::fromStdWString(L"缩小"));
     ZoomOutBtn->setFixedSize(150, 30);
     connect(ZoomOutBtn, SIGNAL(clicked()), this, SLOT(zoomOut()));
-    QPushButton *layoutBtn = new QPushButton(QString::fromStdWString(L"布棋"));
+    QPushButton *layoutBtn = new QPushButton(QString::fromStdWString(L"重新布棋"));
     layoutBtn->setFixedSize(150, 30);
     connect(layoutBtn, SIGNAL(clicked()), this, SLOT(layoutQizi()));
     QPushButton *revokedBtn = new QPushButton(QString::fromStdWString(L"悔棋"));
@@ -65,6 +65,18 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     switchColorBtn->setFixedSize(150, 30);
     switchColorBtn->setIcon(XYQishou::getInstance()->getSideIcon());
     connect(switchColorBtn, SIGNAL(clicked()), this, SLOT(switchColor()));
+    QPushButton *hostingBtn = new QPushButton(QString::fromStdWString(L"托管"));
+    hostingBtn->setFixedSize(150, 30);
+    connect(hostingBtn, SIGNAL(clicked()), this, SLOT(hosting()));
+    QPushButton *receiveBtn = new QPushButton(QString::fromStdWString(L"接收广播棋步"));
+    receiveBtn->setFixedSize(150, 30);
+    connect(receiveBtn, SIGNAL(clicked()), this, SLOT(receiveUDP()));
+    QPushButton *sendBtn = new QPushButton(QString::fromStdWString(L"发送广播棋步"));
+    sendBtn->setFixedSize(150, 30);
+    connect(sendBtn, SIGNAL(clicked()), this, SLOT(sendUDP()));
+    QPushButton *aiBtn = new QPushButton(QString::fromStdWString(L"开启AI"));
+    aiBtn->setFixedSize(150, 30);
+    connect(aiBtn, SIGNAL(clicked()), this, SLOT(startAI()));
 
     sendMessageEdit = new QLineEdit;
     sendMessageEdit->installEventFilter(XYInput::getInstance());
@@ -76,6 +88,10 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     layout->setContentsMargins(25, 20, 0, 30);
 
     layout->addWidget(allOnlinePeoplesWidget, 1);
+    layout->addWidget(receiveBtn);
+    layout->addWidget(sendBtn);
+    layout->addWidget(aiBtn);
+    layout->addWidget(hostingBtn);
     layout->addWidget(switchColorBtn);
     layout->addWidget(switchBtn);
     layout->addWidget(revokedBtn);
@@ -212,8 +228,165 @@ void XYBattleInfoWidget::switchViews()
 void XYBattleInfoWidget::switchColor()
 {
     QPushButton *btn = (QPushButton *)sender();
-    XYQishou::getInstance()->switchSideType();
+    XYQiziWidget::SIDETYPE type = XYQishou::getInstance()->switchSideType();
     btn->setIcon(XYQishou::getInstance()->getSideIcon());
+
+    if (type == XYQiziWidget::RED)
+    {
+        XYAIQishou::getInstance()->setSideType(XYQiziWidget::BLACK);
+    }
+    else if (type == XYQiziWidget::BLACK)
+    {
+        XYAIQishou::getInstance()->setSideType(XYQiziWidget::RED);
+    }
+}
+
+void XYBattleInfoWidget::hosting()
+{
+    QPushButton *btn = (QPushButton *)sender();
+    if (!XYQishou::getInstance()->isHosting())
+    {
+        btn->setIcon(XYQishou::getInstance()->getSideIcon());
+        XYQishou::getInstance()->setHosting(true);
+    }
+    else
+    {
+        btn->setIcon(QIcon());
+        XYQishou::getInstance()->setHosting(false);
+    }
+}
+
+void XYBattleInfoWidget::receiveUDP()
+{
+    QPushButton *btn = (QPushButton *)sender();
+    XYQishou::getInstance()->switchReceive();
+    if (XYQishou::getInstance()->isReceiveUDPQibu())
+    {
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #2d9d00;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+    }
+    else
+    {
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #473C8B;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+    }
+}
+
+void XYBattleInfoWidget::sendUDP()
+{
+
+    QPushButton *btn = (QPushButton *)sender();
+    XYQishou::getInstance()->switchSend();
+    if (XYQishou::getInstance()->isSendUDPQibu())
+    {
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #2d9d00;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+    }
+    else
+    {
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #473C8B;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+    }
+}
+
+void XYBattleInfoWidget::startAI()
+{
+    QPushButton *btn = (QPushButton *)sender();
+    XYAIQishou::getInstance()->switchAI();
+    if (XYAIQishou::getInstance()->isAIStart())
+    {
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #2d9d00;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+    }
+    else
+    {
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #473C8B;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+    }
 }
 
 void XYBattleInfoWidget::sendMessage()

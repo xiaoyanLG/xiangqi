@@ -527,7 +527,7 @@ void XYQiziWidget::resizeQizi(const QSize &size)
     resize(qizi.size() * ratio);
 
     XYQipanWidget *qipan = qobject_cast<XYQipanWidget *>(parentWidget());
-    qipan->putQizi(this, curPos.x(), curPos.y(), false);
+    qipan->putQizi(this, curPos.x(), curPos.y(), false, false, false);
 }
 
 void XYQiziWidget::eatQizi()

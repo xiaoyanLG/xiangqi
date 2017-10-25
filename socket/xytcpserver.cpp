@@ -54,7 +54,7 @@ void XYTcpServer::receiveData()
         {
             return;
         }
-        emit receiveUserData(QString::fromUtf8(user), userData, type);
+        emit receiveUserData(QString::fromUtf8(user), userData, type, false);
     }
 }
 

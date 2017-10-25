@@ -38,6 +38,10 @@ private slots:
     void revoked();
     void switchViews();
     void switchColor();
+    void hosting();
+    void receiveUDP();
+    void sendUDP();
+    void startAI();
     void sendMessage();
     void connectPeople(QListWidgetItem *item);
 

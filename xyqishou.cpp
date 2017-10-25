@@ -4,7 +4,12 @@
 
 XYQishou *XYQishou::instance = NULL;
 XYQishou::XYQishou(QObject *parent)
-    : QObject(parent), type(XYQiziWidget::RED), qipan(NULL)
+    : QObject(parent),
+      type(XYQiziWidget::RED),
+      qipan(NULL),
+      hostingSwitch(false),
+      receiveSwitch(false),
+      sendSwitch(false)
 {
     UDPSocket = new XYUdpbroadcast(this);
     TCPServer = new XYTcpServer(this);
@@ -13,11 +18,11 @@ XYQishou::XYQishou(QObject *parent)
             this, SIGNAL(peopleUpline(QString,QHostAddress)));
     connect(UDPSocket, SIGNAL(peopleOffline(QString,QHostAddress)),
             this, SIGNAL(peopleOffline(QString,QHostAddress)));
-    connect(UDPSocket, SIGNAL(receiveUserData(QString,QByteArray,int)),
-            this, SLOT(receiveUserData(QString,QByteArray,int)));
+    connect(UDPSocket, SIGNAL(receiveUserData(QString,QByteArray,int,bool)),
+            this, SLOT(receiveUserData(QString,QByteArray,int,bool)));
 
-    connect(TCPServer, SIGNAL(receiveUserData(QString,QByteArray,int)),
-            this, SLOT(receiveUserData(QString,QByteArray,int)));
+    connect(TCPServer, SIGNAL(receiveUserData(QString,QByteArray,int,bool)),
+            this, SLOT(receiveUserData(QString,QByteArray,int,bool)));
     connect(TCPServer, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             this, SLOT(peopleResponse(QAbstractSocket::SocketState)));
     UDPSocket->writeUplineDatagram();
@@ -66,7 +71,7 @@ void XYQishou::setSideType(XYQiziWidget::SIDETYPE type)
     this->type = type;
 }
 
-void XYQishou::switchSideType()
+XYQiziWidget::SIDETYPE XYQishou::switchSideType()
 {
     if (this->type == XYQiziWidget::RED)
     {
@@ -75,6 +80,51 @@ void XYQishou::switchSideType()
     else if (this->type == XYQiziWidget::BLACK)
     {
         this->type = XYQiziWidget::RED;
+    }
+
+    return this->type;
+}
+
+void XYQishou::setHosting(bool hosting)
+{
+    this->hostingSwitch = hosting;
+
+    if (this->hostingSwitch && qipan->lastSideType != type)
+    {
+        XYAIQishou::getInstance()->start(XYAIQishou::HOSTINGMOVE);
+    }
+}
+
+bool XYQishou::isHosting()
+{
+    return this->hostingSwitch;
+}
+
+bool XYQishou::isReceiveUDPQibu()
+{
+    return this->receiveSwitch;
+}
+
+bool XYQishou::isSendUDPQibu()
+{
+    return this->sendSwitch;
+}
+
+void XYQishou::switchSend()
+{
+    this->sendSwitch = !this->sendSwitch;
+}
+
+void XYQishou::switchReceive()
+{
+    this->receiveSwitch = !this->receiveSwitch;
+}
+
+void XYQishou::qiziMoved(XYQiziWidget *qizi)
+{
+    if (qipan->lastSideType != type && this->hostingSwitch)
+    {
+        XYAIQishou::getInstance()->start(XYAIQishou::HOSTINGMOVE);
     }
 }
 
@@ -96,7 +146,7 @@ void XYQishou::connectPeople(const QHostAddress &address)
     }
 }
 
-void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int type)
+void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int type, bool udp)
 {
     switch (type)
     {
@@ -105,23 +155,26 @@ void XYQishou::receiveUserData(const QString &from, const QByteArray &data, int 
         break;
     case POINT:
     {
-        QDataStream in(data);
-        qint64 type,times;
-        QPoint lastPoint, movePoint;
-        QByteArray key;
-        bool revoked;
-        in  >> type
-            >> times
-            >> lastPoint
-            >> movePoint
-            >> key
-            >> revoked;
-        if (qipan != NULL)
+        if (receiveSwitch || !udp)
         {
-            XYQiziWidget *qizi = qipan->findQizi(key, (XYQiziWidget::TYPE)type, times, lastPoint, movePoint);
-            if (qizi != NULL)
+            QDataStream in(data);
+            qint64 type,times;
+            QPoint lastPoint, movePoint;
+            QByteArray key;
+            bool revoked;
+            in  >> type
+                >> times
+                >> lastPoint
+                >> movePoint
+                >> key
+                >> revoked;
+            if (qipan != NULL)
             {
-                emit moveQizi(qizi, movePoint, revoked);
+                XYQiziWidget *qizi = qipan->findQizi(key, (XYQiziWidget::TYPE)type, times, lastPoint, movePoint);
+                if (qizi != NULL)
+                {
+                    emit moveQizi(qizi, movePoint, revoked, false);
+                }
             }
         }
         break;
@@ -246,17 +299,20 @@ void XYQishou::sendQiziWithUDP(const QHostAddress &address,
                                const QByteArray &key,
                                bool revoked)
 {
-    QByteArray qiziDatagram;
-    QDataStream out(&qiziDatagram, QIODevice::WriteOnly);
+    if (sendSwitch)
+    {
+        QByteArray qiziDatagram;
+        QDataStream out(&qiziDatagram, QIODevice::WriteOnly);
 
-    out << qint64(qizi->type)
-        << qint64(qizi->times)
-        << qizi->curPos
-        << point
-        << key
-        << revoked;
+        out << qint64(qizi->type)
+            << qint64(qizi->times)
+            << qizi->curPos
+            << point
+            << key
+            << revoked;
 
-    UDPSocket->writeUserDatagram(address, qiziDatagram, POINT);
+        UDPSocket->writeUserDatagram(address, qiziDatagram, POINT);
+    }
 }
 
 void XYQishou::sendQiziWithTCP(const QHostAddress &address,
@@ -275,7 +331,7 @@ void XYQishou::sendQiziWithTCP(const QHostAddress &address,
         << key
         << revoked;
 
-    UDPSocket->writeUserDatagram(address, qiziDatagram, POINT);
+    TCPServer->writeUserData(qiziDatagram, POINT);
 }
 
 void XYQishou::peopleResponse(QAbstractSocket::SocketState state)

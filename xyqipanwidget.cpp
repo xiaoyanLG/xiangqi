@@ -77,13 +77,20 @@ void XYQipanWidget::putQiziToDefaultPos(XYQiziWidget *qizi, bool up)
     qizi->curPos = QPoint(row, column);
 }
 
-void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory, bool animation)
+void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory, bool animation, bool sendSocket)
 {
     XYQiziWidget *eaten = NULL;
     QPoint lastPos = qizi->curPos;
 
     if (qizi->type != XYQiziWidget::TEMP)
     {
+        if (sendSocket)
+        {
+            XYQishou::getInstance()->sendQizi(
+                        XYBattleInfoWidget::getInstance()->getSendHostAddress(),
+                        qizi, QPoint(row, column), getQipanStatus(), false);
+        }
+
         if (qiziInqipan[row][column] != NULL && qiziInqipan[row][column] != qizi)
         {
             eaten = qiziInqipan[row][column];
@@ -127,7 +134,6 @@ void XYQipanWidget::putQizi(XYQiziWidget *qizi, int row, int column, bool addHis
         allMoveTimes++;
 
         emit qiziMoved(qizi);
-        emit qiziMoved(lastPos, qizi->curPos, qizi);
     }
 }
 
@@ -188,17 +194,14 @@ void XYQipanWidget::moveToNearestPos(XYQiziWidget *qizi)
     }
     else if (qizi->isMovable(row, column))
     {
-        XYQishou::getInstance()->sendQizi(
-                    XYBattleInfoWidget::getInstance()->getSendHostAddress(),
-                    qizi, QPoint(row, column), getQipanStatus(), false);
-        putQizi(qizi, row, column, true);
+        putQizi(qizi, row, column, true, false, true);
         return;
     }
     else if (qizi->curPos != QPoint(row, column))
     {
         emit showMessages(QString::fromStdWString(L"该棋子不能走这里！"));
     }
-    putQizi(qizi, qizi->curPos.x(), qizi->curPos.y(), false);
+    putQizi(qizi, qizi->curPos.x(), qizi->curPos.y(), false, false, true);
 }
 
 XYQiziWidget *XYQipanWidget::getPositionQizi(int row, int column)
@@ -227,11 +230,11 @@ void XYQipanWidget::showTempQizi(XYQiziWidget *qizi)
 
         if (qizi->isMovable(row, column))
         {
-            putQizi(tempQizi, row, column, false);
+            putQizi(tempQizi, row, column, false, false, true);
         }
         else
         {
-            putQizi(tempQizi, qizi->curPos.x(), qizi->curPos.y(), false);
+            putQizi(tempQizi, qizi->curPos.x(), qizi->curPos.y(), false, false, true);
         }
     }
 }
@@ -243,7 +246,6 @@ void XYQipanWidget::revokeLastQibu(bool socket)
         XYQibu *last = historyQibus.pop();
         if (last->target != NULL)
         {
-            QPoint lastPos = last->target->curPos;
             if (socket)
             {
                 XYQishou::getInstance()->sendQizi(
@@ -255,9 +257,6 @@ void XYQipanWidget::revokeLastQibu(bool socket)
             // 棋子移动次数减1
             last->target->moveTimes--;
             allMoveTimes--;
-
-            emit qiziMoved(last->target);
-            emit qiziMoved(lastPos, last->curPos, last->target);
         }
         if (last->eatenQizi != NULL)
         {
@@ -385,6 +384,75 @@ XYQipanStatus *XYQipanWidget::getCurQipanStatus()
     return status;
 }
 
+bool XYQipanWidget::isHongTop()
+{
+    return hong_jiang->defaultPos.x() < 5;
+}
+
+int *XYQipanWidget::getWushiQipan()
+{
+    XYQiziWidget *temp_qiziInqipan[10][9];
+    if (isHongTop())
+    {
+        memset(temp_qiziInqipan, 0, sizeof(XYQiziWidget *) * 9 * 10);
+        for (int row = 0; row < 10; ++row)
+        {
+            for (int column = 0; column < 9; ++column)
+            {
+                QPoint switchPoint = XYQiziWidget::getSwitchViewsPos(QPoint(row, column));
+                temp_qiziInqipan[switchPoint.x()][switchPoint.y()] = qiziInqipan[row][column];
+            }
+        }
+    }
+    else
+    {
+        memcpy(temp_qiziInqipan, qiziInqipan, sizeof(XYQiziWidget *) * 9 * 10);
+    }
+
+    for (int row = 0; row < 16; ++row)
+    {
+        for (int column = 0; column < 16; ++column)
+        {
+            if (row < 3 || row > 12
+                    || column < 3 || column > 11)
+            {
+                wushiQipan[row * 16 + column] = 0;
+            }
+            else
+            {
+                XYQiziWidget *qizi = temp_qiziInqipan[row - 3][column - 3];
+                if (qizi != NULL)
+                {
+                    if (qizi->type > XYQiziWidget::HONG_JIANG)
+                    {
+                        wushiQipan[row * 16 + column] = 29 - qizi->type;
+                    }
+                    else
+                    {
+                        wushiQipan[row * 16 + column] = 14 - qizi->type;
+                    }
+                }
+                else
+                {
+                    wushiQipan[row * 16 + column] = 0;
+                }
+            }
+        }
+    }
+
+//    for (int i = 0; i < 256; ++i)
+//    {
+//        if (i % 16 == 0)
+//        {
+//            printf("\n");
+//        }
+//        printf("%2d ", wushiQipan[i]);
+//    }
+//    printf("\n");
+//    fflush(stdout);
+    return wushiQipan;
+}
+
 void XYQipanWidget::layoutQizi(bool keep)
 {
     static bool up = true;
@@ -420,7 +488,7 @@ void XYQipanWidget::switchViews()
         qizi->switchViews();
         if (!qizi->getBeEaten())
         {
-            putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+            putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false, false, true);
         }
     }
 
@@ -430,7 +498,7 @@ void XYQipanWidget::switchViews()
         qizi->switchViews();
         if (!qizi->getBeEaten())
         {
-            putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false);
+            putQizi(qizi, qizi->getCurPos().x(), qizi->getCurPos().y(), false, false, true);
         }
     }
 
@@ -443,7 +511,7 @@ void XYQipanWidget::switchViews()
     }
 }
 
-void XYQipanWidget::moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked)
+void XYQipanWidget::moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked, bool socket)
 {
     if (revoked)
     {
@@ -451,7 +519,7 @@ void XYQipanWidget::moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revok
     }
     else
     {
-        putQizi(qizi, point.x(), point.y(), true, true);
+        putQizi(qizi, point.x(), point.y(), true, true, socket);
     }
 }
 

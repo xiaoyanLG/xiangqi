@@ -16,7 +16,12 @@ public:
     ~XYQipanWidget();
     void clear(bool clearHistory);
     void putQiziToDefaultPos(XYQiziWidget *qizi, bool up);
-    void putQizi(XYQiziWidget *qizi, int row, int column, bool addHistory, bool animation = false);
+    void putQizi(XYQiziWidget *qizi,
+                 int row,
+                 int column,
+                 bool addHistory,
+                 bool animation,
+                 bool sendSocket);
     void revokeQizi(XYQiziWidget *qizi, int row, int column, bool beEaten);
     void moveToNearestPos(XYQiziWidget *qizi);
     XYQiziWidget *getPositionQizi(int row, int column);
@@ -32,17 +37,18 @@ public:
 
     QByteArray getQipanStatus();
     XYQipanStatus *getCurQipanStatus();
+    bool isHongTop();
+    int *getWushiQipan();
 
 signals:
     void qiziMoved(XYQiziWidget *qizi);
-    void qiziMoved(const QPoint &src, const QPoint &tar, XYQiziWidget *qizi);
     void sizeChanged(const QSize &size);
     void showMessages(const QString &msg);
 
 public slots:
     void layoutQizi(bool keep = false);
     void switchViews();
-    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked);
+    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked, bool socket = false);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -66,6 +72,8 @@ private:
     int                   allMoveTimes;      // 记录开局以来移动的总次数
 
     XYQiziWidget::SIDETYPE lastSideType;     // 记录上次下棋的棋方
+
+    int                   wushiQipan[256];   // 巫师棋盘格式
 
     friend class XYQipanStatus;
     friend class XYQishou;

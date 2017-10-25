@@ -20,7 +20,11 @@ public:
     XYQiziWidget::SIDETYPE getSideType() const;
     QIcon getSideIcon();
     void setSideType(XYQiziWidget::SIDETYPE type);
-    void switchSideType();
+    XYQiziWidget::SIDETYPE switchSideType();
+    void setHosting(bool hosting);
+    bool isHosting();
+    bool isReceiveUDPQibu();
+    bool isSendUDPQibu();
 
 signals:
     void showMessages(const QString &msg, int times);
@@ -28,12 +32,15 @@ signals:
     void peopleUpline(const QString &name, const QHostAddress &address);
     void peopleOffline(const QString &name, const QHostAddress &address);
     void receiveMessage(const QString &from, const QString &msg);
-    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked);
+    void moveQizi(XYQiziWidget *qizi, const QPoint &point, bool revoked, bool socket);
 
 
 public slots:
+    void switchSend();
+    void switchReceive();
+    void qiziMoved(XYQiziWidget *qizi);
     void connectPeople(const QHostAddress &address);
-    void receiveUserData(const QString &from, const QByteArray &data, int type);
+    void receiveUserData(const QString &from, const QByteArray &data, int type, bool udp);
     void sendMessage(const QHostAddress &address, const QString &msg);
     void sendQizi(const QHostAddress &address,
                   XYQiziWidget *qizi,
@@ -65,6 +72,9 @@ private:
     XYUdpbroadcast        *UDPSocket;
     XYTcpServer           *TCPServer;
     XYQiziWidget::SIDETYPE type;
+    bool                   receiveSwitch;
+    bool                   sendSwitch;
+    bool                   hostingSwitch;     // 是否托管
 
 };
 

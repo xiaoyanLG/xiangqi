@@ -17,9 +17,11 @@ XYAIQishou::XYAIQishou(QObject *parent)
     : QThread(parent),
       level(3),
       aiType(AUTO),
-      sideType(XYQiziWidget::UNKNOWN)
+      sideType(XYQiziWidget::BLACK),
+      AISwitch(false)
 {
     clear();
+    instance = this;
 }
 
 XYAIQishou::~XYAIQishou()
@@ -44,6 +46,26 @@ void XYAIQishou::clear()
     allStatus.clear();
 }
 
+bool XYAIQishou::isAIStart()
+{
+    return this->AISwitch;
+}
+
+void XYAIQishou::start(XYAIQishou::STARTTYPE type, QVariant value)
+{
+    this->type = type;
+    QThread::start();
+}
+
+void XYAIQishou::switchAI()
+{
+    this->AISwitch = !this->AISwitch;
+    if (this->AISwitch && qipan->lastSideType == XYQishou::getInstance()->getSideType())
+    {
+        this->start(AIMOVE);
+    }
+}
+
 void XYAIQishou::setLevel(int level)
 {
     this->level = level;
@@ -57,47 +79,18 @@ void XYAIQishou::setAiType(XYAIQishou::AITYPE type)
 void XYAIQishou::setSideType(XYQiziWidget::SIDETYPE type)
 {
     this->sideType = type;
+    if (this->sideType != qipan->lastSideType && this->AISwitch)
+    {
+        start(AIMOVE);
+    }
 }
 
 void XYAIQishou::qiziMoved(XYQiziWidget *qizi)
 {
-    XYQipanStatus *status = qipan->getCurQipanStatus();
-    lastMovedQizi = curMovedQizi;
-    curMovedQizi = qizi;
-    lastQipanStatus = curQipanStatus;
-    curQipanStatus = status;
-
-    allMovedQizis.append(qizi);
-    allStatus.append(status);
-
-    if (XYQishou::getInstance()->getSideType() == qizi->getSideType())
+    if (qipan->lastSideType != this->sideType
+            && this->AISwitch)
     {
-        start();
-    }
-}
-
-void XYAIQishou::qiziMoved(const QPoint &src, const QPoint &tar, XYQiziWidget *qizi)
-{
-    if (XYQishou::getInstance()->getSideType() == qizi->getSideType())
-    {
-        bool win = false;
-        if (qizi->defaultPos.x() < 5)
-        {
-            win = wushiMoveQizi(XYQiziWidget::getSwitchViewsPos(src));
-            targetPoint = XYQiziWidget::getSwitchViewsPos(tar);
-        }
-        else
-        {
-            win = wushiMoveQizi(src);
-            targetPoint = tar;
-        }
-        if (win)
-        {
-            emit isWin(true);
-            return;
-        }
-        curMovedQizi = qizi;
-        start();
+        start(AIMOVE);
     }
 }
 
@@ -194,27 +187,44 @@ void XYAIQishou::getValues(int level,
 
 void XYAIQishou::run()
 {
-    wushiMoveQizi(targetPoint);
+    // 初始化巫师棋盘
+    int side = 0;
+    switch (type)
+    {
+    case HOSTINGMOVE:
+        side = XYQishou::getInstance()->getSideType();
+        break;
+    case AIMOVE:
+        side = sideType;
+        break;
+    default:
+        break;
+    }
+
+    InitWithXYQipan(qipan->getWushiQipan(), side);
+
+    // 下一步棋
+    AIMove();
+
+    // 获取下棋的棋子及走的位置
     QPoint src, tar;
     bool win = getPos(src, tar);
 
-    if (curMovedQizi->defaultPos.x() < 5)
+    if (qipan->isHongTop())
     {
         src = XYQiziWidget::getSwitchViewsPos(src);
         tar = XYQiziWidget::getSwitchViewsPos(tar);
     }
-
     XYQiziWidget *qizi = qipan->findQizi(src);
 
     if (qizi != NULL)
     {
-        emit moveQizi(qizi, tar, false);
+        emit moveQizi(qizi, tar, false, true);
     }
 
     if (win)
     {
         emit isWin(false);
-        return;
     }
 }
 
