@@ -105,6 +105,7 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     qipanPixmap.load(":/xiangqi/qipan.png");
 
     funcBtns.insert(0, switchColorBtn);
+    funcBtns.insert(1, hostingBtn);
 
     allOnlinePeoplesWidget->addItem(XYUdpbroadcast::getUserName());
 
@@ -230,6 +231,12 @@ void XYBattleInfoWidget::switchColor()
     QPushButton *btn = (QPushButton *)sender();
     XYQiziWidget::SIDETYPE type = XYQishou::getInstance()->switchSideType();
     btn->setIcon(XYQishou::getInstance()->getSideIcon());
+
+    if (XYQishou::getInstance()->isHosting())
+    {
+        funcBtns.value(1)->setIcon(QIcon());
+        XYQishou::getInstance()->setHosting(false);
+    }
 
     if (type == XYQiziWidget::RED)
     {
