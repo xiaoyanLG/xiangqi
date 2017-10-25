@@ -7,6 +7,7 @@
 #include "xyqiziwidget.h"
 #include "xyqipanwidget.h"
 
+class XYQipanWidget;
 class XYQipanStatus
 {
 public:
@@ -17,7 +18,7 @@ public:
               HEI_PAO1, HEI_PAO2, HEI_CHE1, HEI_CHE2, HEI_MA1, HEI_MA2,
               HEI_XIANG1, HEI_XIANG2, HEI_SI1, HEI_SI2, HEI_JIANG = 32};
 
-    explicit XYQipanStatus(XYQipanWidget *qipanWidget);
+    XYQipanStatus(XYQipanWidget *qipanWidget);
     ~XYQipanStatus();
     bool isOver();
     void switchViews();

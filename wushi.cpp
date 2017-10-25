@@ -12,7 +12,10 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>
+//#include <windows.h>
+
+typedef int64_t DWORD;
+typedef int WORD;
 
 // QT
 #include <QPoint>
@@ -20,8 +23,8 @@
 #include <QDebug>
 
 // 窗口和绘图属性
-const int WINDOW_STYLES = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX;
-const int MASK_COLOR = RGB(0, 255, 0);
+//const int WINDOW_STYLES = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX;
+//const int MASK_COLOR = RGB(0, 255, 0);
 const int SQUARE_SIZE = 56;
 const int BOARD_EDGE = 8;
 const int BOARD_WIDTH = BOARD_EDGE + SQUARE_SIZE * 9 + BOARD_EDGE;
@@ -1071,10 +1074,10 @@ static PositionStruct pos; // 局面实例
 
 // 与图形界面有关的全局变量
 static struct {
-  HINSTANCE hInst;                              // 应用程序句柄实例
-  HWND hWnd;                                    // 主窗口句柄
-  HDC hdc, hdcTmp;                              // 设备句柄，只在"ClickSquare"过程中有效
-  HBITMAP bmpBoard, bmpSelected, bmpPieces[24]; // 资源图片句柄
+//  HINSTANCE hInst;                              // 应用程序句柄实例
+//  HWND hWnd;                                    // 主窗口句柄
+//  HDC hdc, hdcTmp;                              // 设备句柄，只在"ClickSquare"过程中有效
+//  HBITMAP bmpBoard, bmpSelected, bmpPieces[24]; // 资源图片句柄
   int sqSelected, mvLast;                       // 选中的格子，上一步棋
   BOOL bFlipped, bGameOver;                     // 是否翻转棋盘，是否游戏结束(不让继续玩下去)
 } Xqwl;
@@ -1606,90 +1609,90 @@ static void SearchMain(void) {
 }
 
 // TransparentBlt 的替代函数，用来修正原函数在 Windows 98 下资源泄漏的问题
-static void TransparentBlt2(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-    HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, UINT crTransparent) {
-  HDC hImageDC, hMaskDC;
-  HBITMAP hOldImageBMP, hImageBMP, hOldMaskBMP, hMaskBMP;
+//static void TransparentBlt2(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+//    HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, UINT crTransparent) {
+//  HDC hImageDC, hMaskDC;
+//  HBITMAP hOldImageBMP, hImageBMP, hOldMaskBMP, hMaskBMP;
 
-  hImageBMP = CreateCompatibleBitmap(hdcDest, nWidthDest, nHeightDest);
-  hMaskBMP = CreateBitmap(nWidthDest, nHeightDest, 1, 1, NULL);
-  hImageDC = CreateCompatibleDC(hdcDest);
-  hMaskDC = CreateCompatibleDC(hdcDest);
-  hOldImageBMP = (HBITMAP) SelectObject(hImageDC, hImageBMP);
-  hOldMaskBMP = (HBITMAP) SelectObject(hMaskDC, hMaskBMP);
+//  hImageBMP = CreateCompatibleBitmap(hdcDest, nWidthDest, nHeightDest);
+//  hMaskBMP = CreateBitmap(nWidthDest, nHeightDest, 1, 1, NULL);
+//  hImageDC = CreateCompatibleDC(hdcDest);
+//  hMaskDC = CreateCompatibleDC(hdcDest);
+//  hOldImageBMP = (HBITMAP) SelectObject(hImageDC, hImageBMP);
+//  hOldMaskBMP = (HBITMAP) SelectObject(hMaskDC, hMaskBMP);
 
-  if (nWidthDest == nWidthSrc && nHeightDest == nHeightSrc) {
-    BitBlt(hImageDC, 0, 0, nWidthDest, nHeightDest,
-        hdcSrc, nXOriginSrc, nYOriginSrc, SRCCOPY);
-  } else {
-    StretchBlt(hImageDC, 0, 0, nWidthDest, nHeightDest,
-        hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, SRCCOPY);
-  }
-  SetBkColor(hImageDC, crTransparent);
-  BitBlt(hMaskDC, 0, 0, nWidthDest, nHeightDest, hImageDC, 0, 0, SRCCOPY);
-  SetBkColor(hImageDC, RGB(0,0,0));
-  SetTextColor(hImageDC, RGB(255,255,255));
-  BitBlt(hImageDC, 0, 0, nWidthDest, nHeightDest, hMaskDC, 0, 0, SRCAND);
-  SetBkColor(hdcDest, RGB(255,255,255));
-  SetTextColor(hdcDest, RGB(0,0,0));
-  BitBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
-      hMaskDC, 0, 0, SRCAND);
-  BitBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
-      hImageDC, 0, 0, SRCPAINT);
+//  if (nWidthDest == nWidthSrc && nHeightDest == nHeightSrc) {
+//    BitBlt(hImageDC, 0, 0, nWidthDest, nHeightDest,
+//        hdcSrc, nXOriginSrc, nYOriginSrc, SRCCOPY);
+//  } else {
+//    StretchBlt(hImageDC, 0, 0, nWidthDest, nHeightDest,
+//        hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, SRCCOPY);
+//  }
+//  SetBkColor(hImageDC, crTransparent);
+//  BitBlt(hMaskDC, 0, 0, nWidthDest, nHeightDest, hImageDC, 0, 0, SRCCOPY);
+//  SetBkColor(hImageDC, RGB(0,0,0));
+//  SetTextColor(hImageDC, RGB(255,255,255));
+//  BitBlt(hImageDC, 0, 0, nWidthDest, nHeightDest, hMaskDC, 0, 0, SRCAND);
+//  SetBkColor(hdcDest, RGB(255,255,255));
+//  SetTextColor(hdcDest, RGB(0,0,0));
+//  BitBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
+//      hMaskDC, 0, 0, SRCAND);
+//  BitBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
+//      hImageDC, 0, 0, SRCPAINT);
 
-  SelectObject(hImageDC, hOldImageBMP);
-  DeleteDC(hImageDC);
-  SelectObject(hMaskDC, hOldMaskBMP);
-  DeleteDC(hMaskDC);
-  DeleteObject(hImageBMP);
-  DeleteObject(hMaskBMP);
-}
+//  SelectObject(hImageDC, hOldImageBMP);
+//  DeleteDC(hImageDC);
+//  SelectObject(hMaskDC, hOldMaskBMP);
+//  DeleteDC(hMaskDC);
+//  DeleteObject(hImageBMP);
+//  DeleteObject(hMaskBMP);
+//}
 
 // 绘制透明图片
-inline void DrawTransBmp(HDC hdc, HDC hdcTmp, int xx, int yy, HBITMAP bmp) {
-  SelectObject(hdcTmp, bmp);
-  TransparentBlt2(hdc, xx, yy, SQUARE_SIZE, SQUARE_SIZE, hdcTmp, 0, 0, SQUARE_SIZE, SQUARE_SIZE, MASK_COLOR);
-}
+//inline void DrawTransBmp(HDC hdc, HDC hdcTmp, int xx, int yy, HBITMAP bmp) {
+//  SelectObject(hdcTmp, bmp);
+//  TransparentBlt2(hdc, xx, yy, SQUARE_SIZE, SQUARE_SIZE, hdcTmp, 0, 0, SQUARE_SIZE, SQUARE_SIZE, MASK_COLOR);
+//}
 
 // 绘制棋盘
-static void DrawBoard(HDC hdc) {
-  int x, y, xx, yy, sq, pc;
-  HDC hdcTmp;
+//static void DrawBoard(HDC hdc) {
+//  int x, y, xx, yy, sq, pc;
+//  HDC hdcTmp;
 
-  // 画棋盘
-  hdcTmp = CreateCompatibleDC(hdc);
-  SelectObject(hdcTmp, Xqwl.bmpBoard);
-  BitBlt(hdc, 0, 0, BOARD_WIDTH, BOARD_HEIGHT, hdcTmp, 0, 0, SRCCOPY);
-  // 画棋子
-  for (x = FILE_LEFT; x <= FILE_RIGHT; x ++) {
-    for (y = RANK_TOP; y <= RANK_BOTTOM; y ++) {
-      if (Xqwl.bFlipped) {
-        xx = BOARD_EDGE + (FILE_FLIP(x) - FILE_LEFT) * SQUARE_SIZE;
-        yy = BOARD_EDGE + (RANK_FLIP(y) - RANK_TOP) * SQUARE_SIZE;
-      } else {
-        xx = BOARD_EDGE + (x - FILE_LEFT) * SQUARE_SIZE;
-        yy = BOARD_EDGE + (y - RANK_TOP) * SQUARE_SIZE;
-      }
-      sq = COORD_XY(x, y);
-      pc = pos.ucpcSquares[sq];
-      if (pc != 0) {
-        DrawTransBmp(hdc, hdcTmp, xx, yy, Xqwl.bmpPieces[pc]);
-      }
-      if (sq == Xqwl.sqSelected || sq == SRC(Xqwl.mvLast) || sq == DST(Xqwl.mvLast)) {
-        DrawTransBmp(hdc, hdcTmp, xx, yy, Xqwl.bmpSelected);
-      }
-    }
-  }
-  DeleteDC(hdcTmp);
-}
+//  // 画棋盘
+//  hdcTmp = CreateCompatibleDC(hdc);
+//  SelectObject(hdcTmp, Xqwl.bmpBoard);
+//  BitBlt(hdc, 0, 0, BOARD_WIDTH, BOARD_HEIGHT, hdcTmp, 0, 0, SRCCOPY);
+//  // 画棋子
+//  for (x = FILE_LEFT; x <= FILE_RIGHT; x ++) {
+//    for (y = RANK_TOP; y <= RANK_BOTTOM; y ++) {
+//      if (Xqwl.bFlipped) {
+//        xx = BOARD_EDGE + (FILE_FLIP(x) - FILE_LEFT) * SQUARE_SIZE;
+//        yy = BOARD_EDGE + (RANK_FLIP(y) - RANK_TOP) * SQUARE_SIZE;
+//      } else {
+//        xx = BOARD_EDGE + (x - FILE_LEFT) * SQUARE_SIZE;
+//        yy = BOARD_EDGE + (y - RANK_TOP) * SQUARE_SIZE;
+//      }
+//      sq = COORD_XY(x, y);
+//      pc = pos.ucpcSquares[sq];
+//      if (pc != 0) {
+//        DrawTransBmp(hdc, hdcTmp, xx, yy, Xqwl.bmpPieces[pc]);
+//      }
+//      if (sq == Xqwl.sqSelected || sq == SRC(Xqwl.mvLast) || sq == DST(Xqwl.mvLast)) {
+//        DrawTransBmp(hdc, hdcTmp, xx, yy, Xqwl.bmpSelected);
+//      }
+//    }
+//  }
+//  DeleteDC(hdcTmp);
+//}
 
 // 播放资源声音
-inline void PlayResWav(int nResId) {
-  PlaySound(MAKEINTRESOURCE(nResId), Xqwl.hInst, SND_ASYNC | SND_NOWAIT | SND_RESOURCE);
-}
+//inline void PlayResWav(int nResId) {
+//  PlaySound(MAKEINTRESOURCE(nResId), Xqwl.hInst, SND_ASYNC | SND_NOWAIT | SND_RESOURCE);
+//}
 
 // 弹出不带声音的提示框
-static void MessageBoxMute(LPCSTR lpszText) {
+//static void MessageBoxMute(LPCSTR lpszText) {
 //  MSGBOXPARAMS mbp;
 //  mbp.cbSize = sizeof(MSGBOXPARAMS);
 //  mbp.hwndOwner = Xqwl.hWnd;
@@ -1707,28 +1710,28 @@ static void MessageBoxMute(LPCSTR lpszText) {
 //    mbp.lpszIcon = MAKEINTRESOURCE(IDI_APPICON);
 //    MessageBoxIndirect(&mbp);
 //  }
-}
+//}
 
 // "DrawSquare"参数
 const BOOL DRAW_SELECTED = TRUE;
 
 // 绘制格子
-static void DrawSquare(int sq, BOOL bSelected = FALSE) {
-  int sqFlipped, xx, yy, pc;
+//static void DrawSquare(int sq, BOOL bSelected = FALSE) {
+//  int sqFlipped, xx, yy, pc;
 
-  sqFlipped = Xqwl.bFlipped ? SQUARE_FLIP(sq) : sq;
-  xx = BOARD_EDGE + (FILE_X(sqFlipped) - FILE_LEFT) * SQUARE_SIZE;
-  yy = BOARD_EDGE + (RANK_Y(sqFlipped) - RANK_TOP) * SQUARE_SIZE;
-  SelectObject(Xqwl.hdcTmp, Xqwl.bmpBoard);
-  BitBlt(Xqwl.hdc, xx, yy, SQUARE_SIZE, SQUARE_SIZE, Xqwl.hdcTmp, xx, yy, SRCCOPY);
-  pc = pos.ucpcSquares[sq];
-  if (pc != 0) {
-    DrawTransBmp(Xqwl.hdc, Xqwl.hdcTmp, xx, yy, Xqwl.bmpPieces[pc]);
-  }
-  if (bSelected) {
-    DrawTransBmp(Xqwl.hdc, Xqwl.hdcTmp, xx, yy, Xqwl.bmpSelected);
-  }
-}
+//  sqFlipped = Xqwl.bFlipped ? SQUARE_FLIP(sq) : sq;
+//  xx = BOARD_EDGE + (FILE_X(sqFlipped) - FILE_LEFT) * SQUARE_SIZE;
+//  yy = BOARD_EDGE + (RANK_Y(sqFlipped) - RANK_TOP) * SQUARE_SIZE;
+//  SelectObject(Xqwl.hdcTmp, Xqwl.bmpBoard);
+//  BitBlt(Xqwl.hdc, xx, yy, SQUARE_SIZE, SQUARE_SIZE, Xqwl.hdcTmp, xx, yy, SRCCOPY);
+//  pc = pos.ucpcSquares[sq];
+//  if (pc != 0) {
+//    DrawTransBmp(Xqwl.hdc, Xqwl.hdcTmp, xx, yy, Xqwl.bmpPieces[pc]);
+//  }
+//  if (bSelected) {
+//    DrawTransBmp(Xqwl.hdc, Xqwl.hdcTmp, xx, yy, Xqwl.bmpSelected);
+//  }
+//}
 
 // 电脑回应一步棋
 static void ResponseMove(void) {

@@ -2,6 +2,7 @@
 #include "xyinput.h"
 #include <QApplication>
 
+#if QT_VERSION >= 0x050000
 // 指定qDebug输出执行函数
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -33,11 +34,12 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
         abort();
     }
 }
-
+#endif
 int main(int argc, char *argv[])
 {
+#if QT_VERSION >= 0x050000
     qInstallMessageHandler(myMessageOutput); //安装LOG
-
+#endif
     QApplication a(argc, argv);
     XYInput::getInstance()->initInputBase(QApplication::applicationDirPath() + "/chineseBase/chinese.db");
     MainWindow w;

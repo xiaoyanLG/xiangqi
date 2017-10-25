@@ -7,6 +7,7 @@
 #include "xyqibu.h"
 #include "xyqipanstatus.h"
 
+class XYQipanStatus;
 class XYQipanWidget : public QWidget
 {
     Q_OBJECT
