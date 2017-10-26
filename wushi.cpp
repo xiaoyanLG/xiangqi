@@ -16,7 +16,9 @@
 
 typedef long long DWORD;
 typedef int WORD;
-typedef char BYTE;
+#ifndef BYTE
+#define BYTE char
+#endif
 typedef int BOOL;
 #define FALSE 0
 #define TRUE 1

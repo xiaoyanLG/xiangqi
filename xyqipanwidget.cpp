@@ -609,8 +609,13 @@ void XYQipanWidget::paintEvent(QPaintEvent *event)
     QFont font = painter.font();
     font.setPointSize(w * 0.55);
     font.setFamily(QString::fromStdWString(L"华文行楷"));
+    QFontMetrics metrics(font);
+    while (metrics.height() > h)
+    {
+        font.setPointSize(font.pointSize() - 2);
+        metrics = QFontMetrics(font);
+    }
     painter.setFont(font);
-
     QRect cheheRect(curX, curY + 4 * h, w * 4, h);
     painter.drawText(cheheRect, QString::fromStdWString(L"楚河"), QTextOption(Qt::AlignCenter));
 
