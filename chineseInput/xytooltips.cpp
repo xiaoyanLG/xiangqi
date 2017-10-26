@@ -11,6 +11,9 @@ XYToolTips::XYToolTips(QWidget *parent)
     this->setWindowFlags(Qt::FramelessWindowHint
                    | Qt::WindowStaysOnTopHint
                    | Qt::Tool);
+#if QT_VERSION >= 0x050000
+    this->setWindowFlags(this->windowFlags() | Qt::WindowDoesNotAcceptFocus);
+#endif
 
     moTimer.setInterval(2000);
     moTimer.setSingleShot(true);

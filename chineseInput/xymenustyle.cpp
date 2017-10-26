@@ -177,8 +177,11 @@ void XYMenuStyle::mouseReleaseEvent(QMouseEvent *event)
                 ((XYMenu *)parentWidget())->raise();
             }
         }
+#if QT_VERSION >= 0x050000
+        emit mopAction->triggered(mopAction->isChecked());
+#elif
         mopAction->trigger();
-//        emit mopAction->triggered(mopAction->isChecked());
+#endif
     }
     else
     {
