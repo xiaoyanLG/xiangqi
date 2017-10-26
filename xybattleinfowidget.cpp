@@ -20,7 +20,7 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
     : QWidget(parent)
 {
     instance = this;
-
+#if QT_VERSION >=0x050000
     QString qss0="QPushButton {\
                     background-color: #473C8B;\
                     border-style: outset;\
@@ -38,54 +38,57 @@ XYBattleInfoWidget::XYBattleInfoWidget(QWidget *parent)
                     border-style: inset;\
                 }";
     this->setStyleSheet(qss0);
+#endif
 
+    int w = 130;
+    int h = 28;
     allOnlinePeoplesWidget = new QListWidget;
-    allOnlinePeoplesWidget->setFixedWidth(150);
+    allOnlinePeoplesWidget->setFixedWidth(w);
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QPushButton *closeBtn = new QPushButton(QString::fromStdWString(L"退出"));
-    closeBtn->setFixedSize(150, 30);
+    closeBtn->setFixedSize(w, h);
     connect(closeBtn, SIGNAL(clicked()), this, SLOT(exit()));
     QPushButton *ZoomInBtn = new QPushButton(QString::fromStdWString(L"放大"));
-    ZoomInBtn->setFixedSize(150, 30);
+    ZoomInBtn->setFixedSize(w, h);
     connect(ZoomInBtn, SIGNAL(clicked()), this, SLOT(zoomIn()));
     QPushButton *ZoomOutBtn = new QPushButton(QString::fromStdWString(L"缩小"));
-    ZoomOutBtn->setFixedSize(150, 30);
+    ZoomOutBtn->setFixedSize(w, h);
     connect(ZoomOutBtn, SIGNAL(clicked()), this, SLOT(zoomOut()));
     QPushButton *layoutBtn = new QPushButton(QString::fromStdWString(L"重新布棋"));
-    layoutBtn->setFixedSize(150, 30);
+    layoutBtn->setFixedSize(w, h);
     connect(layoutBtn, SIGNAL(clicked()), this, SLOT(layoutQizi()));
     QPushButton *revokedBtn = new QPushButton(QString::fromStdWString(L"悔棋"));
-    revokedBtn->setFixedSize(150, 30);
+    revokedBtn->setFixedSize(w, h);
     connect(revokedBtn, SIGNAL(clicked()), this, SLOT(revoked()));
     QPushButton *switchBtn = new QPushButton(QString::fromStdWString(L"切换视角"));
-    switchBtn->setFixedSize(150, 30);
+    switchBtn->setFixedSize(w, h);
     connect(switchBtn, SIGNAL(clicked()), this, SLOT(switchViews()));
     QPushButton *switchColorBtn = new QPushButton(QString::fromStdWString(L"切换棋方"));
-    switchColorBtn->setFixedSize(150, 30);
+    switchColorBtn->setFixedSize(w, h);
     switchColorBtn->setIcon(XYQishou::getInstance()->getSideIcon());
     connect(switchColorBtn, SIGNAL(clicked()), this, SLOT(switchColor()));
     QPushButton *hostingBtn = new QPushButton(QString::fromStdWString(L"托管"));
-    hostingBtn->setFixedSize(150, 30);
+    hostingBtn->setFixedSize(w, h);
     connect(hostingBtn, SIGNAL(clicked()), this, SLOT(hosting()));
     QPushButton *receiveBtn = new QPushButton(QString::fromStdWString(L"接收广播棋步"));
-    receiveBtn->setFixedSize(150, 30);
+    receiveBtn->setFixedSize(w, h);
     connect(receiveBtn, SIGNAL(clicked()), this, SLOT(receiveUDP()));
     QPushButton *sendBtn = new QPushButton(QString::fromStdWString(L"发送广播棋步"));
-    sendBtn->setFixedSize(150, 30);
+    sendBtn->setFixedSize(w, h);
     connect(sendBtn, SIGNAL(clicked()), this, SLOT(sendUDP()));
     QPushButton *aiBtn = new QPushButton(QString::fromStdWString(L"开启AI"));
-    aiBtn->setFixedSize(150, 30);
+    aiBtn->setFixedSize(w, h);
     connect(aiBtn, SIGNAL(clicked()), this, SLOT(startAI()));
 
     sendMessageEdit = new QLineEdit;
     sendMessageEdit->installEventFilter(XYInput::getInstance());
-    sendMessageEdit->setFixedWidth(150);
+    sendMessageEdit->setFixedWidth(w);
     connect(sendMessageEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     messageBox = new QTextEdit;
-    messageBox->setFixedWidth(150);
+    messageBox->setFixedWidth(w);
 
-    layout->setContentsMargins(25, 20, 0, 30);
+    layout->setContentsMargins(15, 20, 0, 30);
 
     layout->addWidget(allOnlinePeoplesWidget, 1);
     layout->addWidget(receiveBtn);
@@ -269,6 +272,8 @@ void XYBattleInfoWidget::receiveUDP()
     XYQishou::getInstance()->switchReceive();
     if (XYQishou::getInstance()->isReceiveUDPQibu())
     {
+        btn->setIcon(QIcon(":/other/used.ico"));
+#if QT_VERSION >=0x050000
         btn->setStyleSheet("QPushButton {\
                            background-color: #2d9d00;\
                            border-style: outset;\
@@ -285,9 +290,12 @@ void XYBattleInfoWidget::receiveUDP()
                            background-color: #1E90FF;\
                            border-style: inset;\
                        }");
+#endif
     }
     else
     {
+        btn->setIcon(QIcon());
+#if QT_VERSION >=0x050000
         btn->setStyleSheet("QPushButton {\
                            background-color: #473C8B;\
                            border-style: outset;\
@@ -304,6 +312,7 @@ void XYBattleInfoWidget::receiveUDP()
                            background-color: #1E90FF;\
                            border-style: inset;\
                        }");
+#endif
     }
 }
 
@@ -314,6 +323,8 @@ void XYBattleInfoWidget::sendUDP()
     XYQishou::getInstance()->switchSend();
     if (XYQishou::getInstance()->isSendUDPQibu())
     {
+        btn->setIcon(QIcon(":/other/used.ico"));
+#if QT_VERSION >=0x050000
         btn->setStyleSheet("QPushButton {\
                            background-color: #2d9d00;\
                            border-style: outset;\
@@ -330,9 +341,12 @@ void XYBattleInfoWidget::sendUDP()
                            background-color: #1E90FF;\
                            border-style: inset;\
                        }");
+#endif
     }
     else
     {
+        btn->setIcon(QIcon());
+#if QT_VERSION >=0x050000
         btn->setStyleSheet("QPushButton {\
                            background-color: #473C8B;\
                            border-style: outset;\
@@ -349,6 +363,7 @@ void XYBattleInfoWidget::sendUDP()
                            background-color: #1E90FF;\
                            border-style: inset;\
                        }");
+#endif
     }
 }
 
@@ -358,6 +373,8 @@ void XYBattleInfoWidget::startAI()
     XYAIQishou::getInstance()->switchAI();
     if (XYAIQishou::getInstance()->isAIStart())
     {
+        btn->setIcon(QIcon(":/other/used.ico"));
+#if QT_VERSION >=0x050000
         btn->setStyleSheet("QPushButton {\
                            background-color: #2d9d00;\
                            border-style: outset;\
@@ -374,9 +391,12 @@ void XYBattleInfoWidget::startAI()
                            background-color: #1E90FF;\
                            border-style: inset;\
                        }");
+#endif
     }
     else
     {
+        btn->setIcon(QIcon());
+#if QT_VERSION >=0x050000
         btn->setStyleSheet("QPushButton {\
                            background-color: #473C8B;\
                            border-style: outset;\
@@ -393,6 +413,7 @@ void XYBattleInfoWidget::startAI()
                            background-color: #1E90FF;\
                            border-style: inset;\
                        }");
+#endif
     }
 }
 

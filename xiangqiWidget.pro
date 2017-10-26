@@ -71,6 +71,6 @@ RESOURCES += \
     images/images.qrc \
     db/db.qrc
 
-RC_FILE = ico.rc
+greaterThan(QT_MAJOR_VERSION, 4): RC_FILE = ico.rc
 
 DISTFILES +=

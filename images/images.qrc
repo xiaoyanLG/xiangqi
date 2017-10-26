@@ -21,5 +21,6 @@
         <file>other/min.png</file>
         <file>other/setting.png</file>
         <file>other/skin.png</file>
+        <file>other/used.ico</file>
     </qresource>
 </RCC>

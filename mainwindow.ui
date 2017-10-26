@@ -31,7 +31,7 @@
        <widget class="XYBattleInfoWidget" name="widget_2" native="true">
         <property name="maximumSize">
          <size>
-          <width>200</width>
+          <width>160</width>
           <height>16777215</height>
          </size>
         </property>

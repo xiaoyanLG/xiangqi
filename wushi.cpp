@@ -14,8 +14,12 @@
 #include <time.h>
 //#include <windows.h>
 
-typedef int64_t DWORD;
+typedef long long DWORD;
 typedef int WORD;
+typedef char BYTE;
+typedef int BOOL;
+#define FALSE 0
+#define TRUE 1
 
 // QT
 #include <QPoint>
