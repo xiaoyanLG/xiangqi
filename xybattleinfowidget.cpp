@@ -420,6 +420,10 @@ void XYBattleInfoWidget::startAI()
 void XYBattleInfoWidget::sendMessage()
 {
     QString data = sendMessageEdit->text();
+    if (data.isEmpty())
+    {
+        return;
+    }
     sendMessageEdit->clear();
     QHostAddress address = getSendHostAddress();
 

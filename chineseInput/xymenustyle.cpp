@@ -179,7 +179,7 @@ void XYMenuStyle::mouseReleaseEvent(QMouseEvent *event)
         }
 #if QT_VERSION >= 0x050000
         emit mopAction->triggered(mopAction->isChecked());
-#elif
+#else
         mopAction->trigger();
 #endif
     }

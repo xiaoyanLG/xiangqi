@@ -73,4 +73,4 @@ RESOURCES += \
 
 greaterThan(QT_MAJOR_VERSION, 4): RC_FILE = ico.rc
 
-DISTFILES +=
+QMAKE_CXXFLAGS += -std=c++11
