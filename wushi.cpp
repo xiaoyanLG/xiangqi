@@ -1603,16 +1603,17 @@ static void SearchMain(void) {
   }
 
   // 迭代加深过程
-  for (i = 1; i <= searchDepAI && i <= MAX_GEN_MOVES; i ++) {
+  int temp_dep = searchDepAI;
+  for (i = 1; i <= temp_dep && i <= MAX_GEN_MOVES; i ++) {
     vl = SearchRoot(i);
     // 搜索到杀棋，就终止搜索
     if (vl > WIN_VALUE || vl < -WIN_VALUE) {
       break;
     }
 
-    // 超过一秒，就终止搜索
-    if (clock() - t > CLOCKS_PER_SEC * 15) {
-      break;
+    // 超过一秒，就终止搜索(改为低于5秒再继续搜索)
+    if (clock() - t < CLOCKS_PER_SEC * 5 && i == temp_dep) {
+        temp_dep++;
     }
   }
 }

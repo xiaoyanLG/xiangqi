@@ -14,6 +14,7 @@ public:
 public slots:
     void start();
     void stop();
+    void resetPos();
 
 protected:
     void timerEvent(QTimerEvent *event);

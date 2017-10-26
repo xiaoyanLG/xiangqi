@@ -15,7 +15,7 @@ XYAIQishou *XYAIQishou::getInstance()
 
 XYAIQishou::XYAIQishou(QObject *parent)
     : QThread(parent),
-      level(8),
+      level(9),
       aiType(AUTO),
       sideType(XYQiziWidget::BLACK),
       AISwitch(false)

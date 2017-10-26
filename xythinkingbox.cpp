@@ -2,6 +2,7 @@
 #include <QLabel>
 #include <QMovie>
 #include <QGridLayout>
+#include <QTimerEvent>
 
 XYThinkingBox::XYThinkingBox(const QString &text, QWidget *parent)
     : QWidget(parent), times(0), timeID(0)
@@ -37,7 +38,8 @@ void XYThinkingBox::start()
     timeID = startTimer(1000);
     times = 0;
     movie->start();
-    timeLabel->setText(QString("<font color=#158243 size=8><strong>%1</strong></font>").arg(times));
+    resetPos();
+    timeLabel->setText(QString("<font color=#991512 size=8><strong>%1</strong></font>").arg(times));
 }
 
 void XYThinkingBox::stop()
@@ -48,12 +50,18 @@ void XYThinkingBox::stop()
     movie->stop();
 }
 
+void XYThinkingBox::resetPos()
+{
+    move((parentWidget()->width() - 150 - width()) / 2,
+                      (parentWidget()->height() - height())/ 2 - 10);
+}
+
 void XYThinkingBox::timerEvent(QTimerEvent *event)
 {
     if (timeID == event->timerId())
     {
         times++;
-        timeLabel->setText(QString("<font color=#158243 size=10>%1</font>").arg(times));
+        timeLabel->setText(QString("<font color=#991512 size=10>%1</font>").arg(times));
     }
 }
 

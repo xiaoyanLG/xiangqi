@@ -38,8 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widget, SIGNAL(qiziMoved(XYQiziWidget*)),
             ai, SLOT(qiziMoved(XYQiziWidget*)));
     connect(ai, SIGNAL(isWin(bool)), this, SLOT(isWin(bool)));
-//    connect(ui->widget, SIGNAL(qiziMoved(QPoint, QPoint,XYQiziWidget*,bool)),
-//            ai, SLOT(qiziMoved(QPoint, QPoint,XYQiziWidget*,bool)));
     connect(ai, SIGNAL(moveQizi(XYQiziWidget*,QPoint,bool,bool)),
             ui->widget, SLOT(moveQizi(XYQiziWidget*,QPoint,bool,bool)));
 
@@ -66,12 +64,12 @@ MainWindow::MainWindow(QWidget *parent) :
     thinkingBox = new XYThinkingBox(QString::fromStdWString(L"AI正在思考"), this);
     connect(ai, SIGNAL(started()), thinkingBox, SLOT(start()));
     connect(ai, SIGNAL(finished()), thinkingBox, SLOT(stop()));
+    connect(ui->widget, SIGNAL(sizeChanged(QSize)),
+            thinkingBox, SLOT(resetPos()));
 
     resize(1000, 800);
     layoutQizi();
 
-    thinkingBox->move((width() - 150 - thinkingBox->width()) / 2,
-                      (height() - thinkingBox->height())/ 2 - 10);
     thinkingBox->setVisible(false);
 }
 
