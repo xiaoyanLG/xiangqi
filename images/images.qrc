@@ -22,5 +22,6 @@
         <file>other/setting.png</file>
         <file>other/skin.png</file>
         <file>other/used.ico</file>
+        <file>other/thinking.gif</file>
     </qresource>
 </RCC>

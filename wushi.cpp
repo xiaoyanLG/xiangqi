@@ -69,6 +69,8 @@ const int HASH_BETA = 2;       // BETA节点的置换表项
 const int HASH_PV = 3;         // PV节点的置换表项
 const int BOOK_SIZE = 16384;   // 开局库大小
 
+int  searchDepAI = 8;          // 搜索深度
+
 // 判断棋子是否在棋盘中的数组
 static const char ccInBoard[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1601,14 +1603,15 @@ static void SearchMain(void) {
   }
 
   // 迭代加深过程
-  for (i = 1; i <= LIMIT_DEPTH; i ++) {
+  for (i = 1; i <= searchDepAI && i <= MAX_GEN_MOVES; i ++) {
     vl = SearchRoot(i);
     // 搜索到杀棋，就终止搜索
     if (vl > WIN_VALUE || vl < -WIN_VALUE) {
       break;
     }
+
     // 超过一秒，就终止搜索
-    if (clock() - t > CLOCKS_PER_SEC) {
+    if (clock() - t > CLOCKS_PER_SEC * 15) {
       break;
     }
   }
@@ -2006,14 +2009,6 @@ void Startup(void) {
 //}
 
 // 自定义函数
-// 个人移动（连续调用两次，第一次选择棋子，第二次移动选择的棋子）
-bool wushiMoveQizi(const QPoint &tar)
-{
-    int x = FILE_LEFT + tar.y();
-    int y = RANK_TOP + tar.x();
-
-    return ClickSquare(COORD_XY(x, y));
-}
 
 // 获取当前AI移动的点（必须在调该函数的时候AI先走一步）
 bool getPos(QPoint &src, QPoint &tar)
@@ -2065,4 +2060,10 @@ void InitWithXYQipan(int *qipan, int aiSide)
       }
     }
     pos.SetIrrev();
+}
+
+// 设置搜索深度
+void setAISearchDep(int dep)
+{
+    searchDepAI = dep;
 }

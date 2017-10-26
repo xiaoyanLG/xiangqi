@@ -9,6 +9,7 @@ namespace Ui {
 class MainWindow;
 }
 class XYQiziWidget;
+class XYThinkingBox;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -38,6 +39,7 @@ private:
     XYQishou *me;
     XYAIQishou *ai;
     Ui::MainWindow *ui;
+    XYThinkingBox *thinkingBox;
 };
 
 #endif // MAINWINDOW_H

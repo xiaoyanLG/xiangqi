@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     chineseInput/xytranslateview.cpp \
     xyaiqishou.cpp \
     xyqipanstatus.cpp \
-    wushi.cpp
+    wushi.cpp \
+    xythinkingbox.cpp
 
 HEADERS  += mainwindow.h \
     xyqipanwidget.h \
@@ -63,7 +64,8 @@ HEADERS  += mainwindow.h \
     xyaiqishou.h \
     xyqipanstatus.h \
     xyaivalue.h \
-    wushi.h
+    wushi.h \
+    xythinkingbox.h
 
 FORMS    += mainwindow.ui
 

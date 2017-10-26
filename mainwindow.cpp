@@ -1,6 +1,7 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "xyqiziwidget.h"
+#include "xythinkingbox.h"
 #include <QMouseEvent>
 #include <QApplication>
 #include <QLabel>
@@ -62,8 +63,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widget, SIGNAL(showMessages(QString)), this, SLOT(showMessage(QString)));
 
     instance = this;
+    thinkingBox = new XYThinkingBox(QString::fromStdWString(L"AI正在思考"), this);
+    connect(ai, SIGNAL(started()), thinkingBox, SLOT(start()));
+    connect(ai, SIGNAL(finished()), thinkingBox, SLOT(stop()));
+
     resize(1000, 800);
     layoutQizi();
+
+    thinkingBox->move((width() - 150 - thinkingBox->width()) / 2,
+                      (height() - thinkingBox->height())/ 2 - 10);
+    thinkingBox->setVisible(false);
 }
 
 MainWindow::~MainWindow()

@@ -15,7 +15,7 @@ XYAIQishou *XYAIQishou::getInstance()
 
 XYAIQishou::XYAIQishou(QObject *parent)
     : QThread(parent),
-      level(3),
+      level(8),
       aiType(AUTO),
       sideType(XYQiziWidget::BLACK),
       AISwitch(false)
@@ -202,6 +202,9 @@ void XYAIQishou::run()
     }
 
     InitWithXYQipan(qipan->getWushiQipan(), side);
+
+    // 设置搜索深度
+    setAISearchDep(level);
 
     // 下一步棋
     AIMove();
