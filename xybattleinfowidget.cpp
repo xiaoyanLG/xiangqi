@@ -258,11 +258,47 @@ void XYBattleInfoWidget::hosting()
     {
         btn->setIcon(XYQishou::getInstance()->getSideIcon());
         XYQishou::getInstance()->setHosting(true);
+#if QT_VERSION >=0x050000
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #2d9d00;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+#endif
     }
     else
     {
         btn->setIcon(QIcon());
         XYQishou::getInstance()->setHosting(false);
+#if QT_VERSION >=0x050000
+        btn->setStyleSheet("QPushButton {\
+                           background-color: #473C8B;\
+                           border-style: outset;\
+                           border-width: 2px;\
+                           border-radius: 5px;\
+                           border-color: #8B7355;\
+                           font: bold 14px;\
+                           min-width:2em;\
+                           color:white;\
+                           font-family:华文新魏;\
+                           padding: 5px;\
+                       }\
+                       QPushButton:pressed {\
+                           background-color: #1E90FF;\
+                           border-style: inset;\
+                       }");
+#endif
     }
 }
 
