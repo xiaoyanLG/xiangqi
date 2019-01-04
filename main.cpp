@@ -6,12 +6,12 @@
 // 指定qDebug输出执行函数
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    static FILE *file = fopen("I:/DeskTop/log.txt", "w+");
+    static FILE *file = fopen("log.txt", "w+");
     if (file == NULL) {
-        FILE *file = fopen("I:/DeskTop/log.txt", "w+");
+        FILE *file = fopen("log.txt", "w+");
         if (file == NULL) {
             printf("Warning: Open log file failed!\n");
-            file = stdout;
+            exit(-1);
         }
     }
     QByteArray localMsg = msg.toLocal8Bit();
